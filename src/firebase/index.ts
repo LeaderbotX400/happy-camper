@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { getFunctions } from "firebase/functions";
+import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 import { getPerformance } from "firebase/performance";
 import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 
@@ -28,12 +28,6 @@ const appCheck = initializeAppCheck(app, {
   isTokenAutoRefreshEnabled: true,
 });
 
-export {
-  type app,
-  type analytics,
-  type auth,
-  type db,
-  type functions,
-  type performance,
-  type appCheck,
-};
+connectFunctionsEmulator(functions, "localhost", 5001);
+
+export { app, analytics, auth, db, functions, performance, appCheck };
