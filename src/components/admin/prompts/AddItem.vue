@@ -5,12 +5,17 @@
     max-width="500px"
     max-height="340px"
     :overlay="true"
+    persistent
     transition="dialog-transition"
   >
     <template v-slot:activator="{ props }">
       <v-btn color="primary" v-bind="props"> Add Item </v-btn>
     </template>
-    <v-card color="white" :disabled="loading">
+    <v-card color="white" :disabled="loading" :loading="loading">
+      <v-alert v-if="error != null" color="error">
+        {{ error }}
+      </v-alert>
+
       <v-card-title primary-title> Add New Item </v-card-title>
       <v-form ref="newItem" lazy-validation @submit.prevent>
         <v-container align="center">
@@ -40,6 +45,7 @@
             <v-col>
               <v-switch
                 v-model="input.available"
+                default="true"
                 label="Item is Available"
                 color="primary"
               />
@@ -47,12 +53,13 @@
           </v-row>
         </v-container>
         <v-card-actions>
-          <v-btn color="success" @click="addItem(input)"> Confirm </v-btn>
+          <v-btn color="success" @click="addItem(input)" :loading="loading">
+            Confirm
+          </v-btn>
           <v-btn color="error" @click="cancel()"> cancel </v-btn>
         </v-card-actions>
       </v-form>
     </v-card>
-    <v-btn loading>test</v-btn>
   </v-dialog>
 </template>
 
@@ -80,6 +87,7 @@ export default defineComponent({
       nameRules: [(v: any) => !!v || "Name is required"],
       priceRules: [(v: any) => !!v || "Price is required"],
       inputMenu: false,
+      error: null,
     };
   },
   methods: {
@@ -97,13 +105,9 @@ export default defineComponent({
         this.loading = true;
         try {
           await httpsCallable(functions, "addItem")(input);
-          this.inputMenu = false;
-          this.input = {
-            name: "",
-            price: 0,
-            available: false,
-          };
+          this.cancel();
         } catch (error) {
+          this.error = error;
           console.log(error);
         }
         this.loading = false;

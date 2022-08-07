@@ -13,13 +13,13 @@
           <v-icon>mdi-delete</v-icon> Delete
         </v-btn>
       </template>
-      <v-card>
+      <v-card :disabled="loading" :loadind="loading">
         <v-card-title>
           Are you sure you want to delete this Item?
         </v-card-title>
         <v-card-text> Note: This action can not be undone </v-card-text>
         <v-card-actions>
-          <v-btn color="success" @click="deleteItem(item)"> Yes </v-btn>
+          <v-btn color="success" @click="deleteItem()"> Yes </v-btn>
           <v-btn color="error" @click="deleteItemMenu = false"> No </v-btn>
         </v-card-actions>
       </v-card>
@@ -27,28 +27,32 @@
   </div>
 </template>
 
-<script>
-import { db } from "@/firebase";
-import { doc, updateDoc } from "firebase/firestore";
-
+<script lang="ts">
 import { defineComponent } from "vue";
+import { functions } from "@/firebase";
+import { httpsCallable } from "@firebase/functions";
+
 export default defineComponent({
   name: "DeleteItem",
   props: {
-    items: Array,
     item: String,
   },
   data() {
     return {
       deleteItemMenu: false,
+      loading: false,
     };
   },
   methods: {
-    async deleteItem(item) {
-      this.deleteItemMenu = false;
-      await updateDoc(doc(db, "admin/items"), {
-        food: this.items.filter((i) => i !== item),
-      });
+    async deleteItem() {
+      try {
+        this.deleteItemMenu = false;
+        const deleteItem = httpsCallable(functions, "deleteItem");
+        await deleteItem({ item: this.item });
+      } catch (error) {
+        console.log(error);
+      }
+      this.loading = false;
     },
   },
 });

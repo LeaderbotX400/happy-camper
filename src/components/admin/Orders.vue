@@ -32,12 +32,10 @@
                     v-for="(item, index) in order.items"
                     :key="index"
                   >
-                    <v-list-item-content>
-                      <v-list-item-title>{{ item.name }}</v-list-item-title>
-                      <v-list-item-subtitle>{{
-                        item.quantity
-                      }}</v-list-item-subtitle>
-                    </v-list-item-content>
+                    <v-list-item-title>{{ item.name }}</v-list-item-title>
+                    <v-list-item-subtitle>{{
+                      item.quantity
+                    }}</v-list-item-subtitle>
                   </v-list-item>
                 </v-list>
               </v-col>

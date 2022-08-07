@@ -7,10 +7,11 @@ export const addItem = functions.https.onCall(async (data, context) => {
     throw new functions.https.HttpsError("permission-denied", "Unknown origin");
   }
 
+  console.log(data);
   const item = {
     name: data.name,
     price: data.price,
-    avalible: data.avalible,
+    available: data.available,
   };
   const batch = admin.firestore().batch();
   batch.update(admin.firestore().doc("data/items"), {
@@ -25,7 +26,7 @@ export const addItem = functions.https.onCall(async (data, context) => {
   });
 
   return batch.commit().catch((err) => {
-    throw new functions.https.HttpsError("internal", err);
+    throw new functions.https.HttpsError("internal", err.message);
   });
 });
 

@@ -6,6 +6,7 @@ service cloud.firestore {
     }
     match /data/items {
       allow read: if request.auth.uid != null;
+      allow update: if checkAdmin() && (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['items']));
     }
     match /data/users/{userId} {
       allow read: if request.auth.uid == userId;

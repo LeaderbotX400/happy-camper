@@ -6,19 +6,8 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col v-for="item in items" :key="item">
-        <v-menu>
-          <template v-slot:activator="{ props }">
-            <v-btn color="info" v-bind="props">
-              {{ item }}
-            </v-btn>
-          </template>
-          <v-list>
-            <v-list-item>
-              <DeleteItem :item="item" :items="items"></DeleteItem>
-            </v-list-item>
-          </v-list>
-        </v-menu>
+      <v-col v-for="(item, index) in items" :key="index">
+        <Item :item="item" :index="index" />
       </v-col>
     </v-row>
   </v-container>
@@ -27,17 +16,21 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { db } from "@/firebase";
-import { doc, onSnapshot } from "@firebase/firestore";
+import { doc, onSnapshot, updateDoc } from "@firebase/firestore";
 import AddItem from "./prompts/AddItem.vue";
+import DeleteItem from "./prompts/DeleteItem.vue";
+import Item from "./Item.vue";
 
 export default defineComponent({
   name: "Item Menu",
   components: {
     AddItem,
+    DeleteItem,
+    Item,
   },
   data() {
     return {
-      items: [],
+      items: [] as any,
     };
   },
   mounted() {
