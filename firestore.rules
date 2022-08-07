@@ -1,11 +1,19 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if false;
+    function checkAdmin() {
+      return request.auth.uid != null && request.auth.token.admin == true && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.admin == true;
     }
-    match /data/{document=**} {
-      allow read: if true;
+    match /data/items {
+      allow read: if request.auth.uid != null;
     }
+    match /data/users/{userId} {
+      allow read: if request.auth.uid == userId;
+    }
+    match /orders/{orderId} {
+      allow read: if request.auth.uid == userId || checkAdmin();
+      allow update: if checkAdmin();
+    }
+
   }
 }

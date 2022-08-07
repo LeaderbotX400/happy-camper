@@ -19,6 +19,7 @@
   "dependencies": {
     "@mdi/font": "7.0.96",
     "chart.js": "^3.9.1",
+    "cypress": "^10.4.0",
     "firebase": "^9.9.2",
     "firebaseui": "^6.0.1",
     "roboto-fontface": "*",
@@ -35,7 +36,6 @@
     "@vitejs/plugin-vue": "^3.0.1",
     "@vue/eslint-config-typescript": "^11.0.0",
     "@vue/tsconfig": "^0.1.3",
-    "cypress": "^10.4.0",
     "eslint": "^8.21.0",
     "eslint-plugin-cypress": "^2.12.1",
     "eslint-plugin-vue": "^9.3.0",
