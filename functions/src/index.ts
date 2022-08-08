@@ -11,6 +11,10 @@ export const addItem = functions.https.onCall(async (data, context) => {
   const item = {
     name: data.name,
     price: data.price,
+    stock: data.stock,
+    stats: {
+      totalSold: 0,
+    },
     available: data.available,
   };
   const batch = admin.firestore().batch();
@@ -44,8 +48,27 @@ export const submitOrder = functions.https.onCall(async (data, context) => {
     created: admin.firestore.FieldValue.serverTimestamp(),
     email: context.auth?.token.email,
   });
+  await admin.firestore().runTransaction(async (t) => {
+    const doc = await t.get(admin.firestore().doc("data/items"));
+    const items = doc.data()?.items;
+    if (items == undefined || items.length == 0) {
+      throw new functions.https.HttpsError("internal", "No items found");
+    }
+    const newItems = items.map((item: any) => {
+      const index = data.items.findIndex((i: any) => i.name === item.name);
+      if (index !== -1) {
+        item.stock -= data.items[index].quantity;
+        item.available = item.stock > 0;
+        item.stats.totalSold += data.items[index].quantity;
+      }
+      return item;
+    });
+    batch.update(admin.firestore().doc("data/items"), {
+      items: newItems,
+    });
+  });
   return batch.commit().catch((err) => {
-    return err;
+    throw new functions.https.HttpsError("internal", err);
   });
 });
 
