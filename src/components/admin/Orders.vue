@@ -1,5 +1,11 @@
 <template>
   <v-container>
+    <v-card>
+      <v-card-title>
+        <h2>Orders</h2>
+      </v-card-title>
+      <v-card-text v-if="orders.length <= 0"> No orders yet. </v-card-text>
+    </v-card>
     <v-expansion-panels>
       <v-expansion-panel v-for="(order, index) in orders" :key="index">
         <v-expansion-panel-title>
@@ -62,14 +68,6 @@
                 </v-menu>
               </div>
             </v-row>
-            <v-row>
-              <v-col>
-                <v-code class="ma-4" v-if="rawData[index]">
-                  <h3>Raw data:</h3>
-                  <pre>{{ order }}</pre>
-                </v-code>
-              </v-col>
-            </v-row>
             <v-row v-if="!order.completed">
               <v-col>
                 <v-btn
@@ -79,6 +77,14 @@
                 >
                   Complete
                 </v-btn>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-code class="ma-2" v-if="rawData[index]">
+                  <h3>Raw data:</h3>
+                  <pre>{{ order }}</pre>
+                </v-code>
               </v-col>
             </v-row>
           </v-container>
@@ -120,8 +126,10 @@ export default defineComponent({
         });
         try {
           onSnapshot(collection(db, "orders"), (querySnapshot) => {
+            this.orders = {};
             querySnapshot.forEach((doc) => {
               this.orders[doc.id] = doc.data();
+              this.rawData[doc.id] = false;
             });
           });
         } catch {

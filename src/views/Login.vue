@@ -37,14 +37,13 @@ export default defineComponent({
           },
         },
         signinFlow: "popup",
-        signInSuccessUrl: "/user",
+        signInSuccessUrl: "/orders",
         signInOptions: [
           {
             provider: GoogleAuthProvider.PROVIDER_ID,
             clientID:
               "1040176877182-1gbs6vbh1d053l873f3hocsn3kiskd9f.apps.googleusercontent.com",
           },
-          firebaseui.auth.AnonymousAuthProvider.PROVIDER_ID,
         ],
         credentialHelper: firebaseui.auth.CredentialHelper.GOOGLE_YOLO,
       };

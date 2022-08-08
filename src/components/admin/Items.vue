@@ -1,13 +1,13 @@
 <template>
-  <v-container grid-list-xs align="center">
+  <v-container grid-list-xs>
     <v-row>
-      <v-col>
+      <v-col align="center">
         <AddItem :items="items"></AddItem>
       </v-col>
     </v-row>
     <v-row>
       <v-col v-for="(item, index) in items" :key="index">
-        <Item :item="item" :index="index" />
+        <Item :item="item" :index="index" :items="items" />
       </v-col>
     </v-row>
   </v-container>
@@ -16,7 +16,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { db } from "@/firebase";
-import { doc, onSnapshot, updateDoc } from "@firebase/firestore";
+import { doc, onSnapshot } from "@firebase/firestore";
 import AddItem from "./prompts/AddItem.vue";
 import DeleteItem from "./prompts/DeleteItem.vue";
 import Item from "./Item.vue";

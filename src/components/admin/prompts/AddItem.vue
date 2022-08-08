@@ -17,31 +17,48 @@
       </v-alert>
 
       <v-card-title primary-title> Add New Item </v-card-title>
-      <v-form ref="newItem" lazy-validation @submit.prevent>
+      <v-form ref="newItem" lazy-validation>
         <v-container align="center">
           <v-row>
-            <v-text-field
-              class="mx-5 input"
-              v-model="input.name"
-              label="Item Name"
-              :rules="nameRules"
-              placeholder="Item Name"
-              type="name"
-              required
-              shaped
-            />
-            <v-text-field
-              class="mx-5 input"
-              v-model="input.price"
-              label="Price"
-              :rules="priceRules"
-              placeholder="2.00"
-              type="name"
-              required
-              shaped
-            />
+            <v-col>
+              <v-text-field
+                class="mx-5 input"
+                v-model="input.name"
+                label="Item Name"
+                :rules="rules.name"
+                placeholder="Item Name"
+                type="name"
+                required
+                shaped
+              />
+            </v-col>
+            <v-col>
+              <v-text-field
+                class="mx-5 input"
+                v-model="input.price"
+                prefix="$"
+                label="Price"
+                :rules="rules.price"
+                placeholder="2.00"
+                type="number"
+                required
+                shaped
+              />
+            </v-col>
           </v-row>
-          <v-row align="center">
+          <v-row>
+            <v-col>
+              <v-text-field
+                class="mx-5 input"
+                v-model="input.stock"
+                label="Stock"
+                :rules="rules.stock"
+                placeholder="100"
+                type="number"
+                required
+                shaped
+              />
+            </v-col>
             <v-col>
               <v-switch
                 v-model="input.available"
@@ -71,6 +88,7 @@ import { httpsCallable } from "@firebase/functions";
 interface Input {
   name: string;
   price: number;
+  stock: number;
   available: boolean;
 }
 
@@ -80,14 +98,18 @@ export default defineComponent({
       input: <Input>{
         name: "",
         price: 0,
+        stock: 0,
         available: false,
       },
       loading: false,
       props: false,
-      nameRules: [(v: any) => !!v || "Name is required"],
-      priceRules: [(v: any) => !!v || "Price is required"],
+      rules: {
+        name: [(v: any) => !!v || "Name is required"],
+        price: [(v: any) => !!v || "Price is required"],
+        stock: [(v: any) => !!v || "Stock amount is required"],
+      },
       inputMenu: false,
-      error: null,
+      error: null as any,
     };
   },
   methods: {
@@ -96,10 +118,12 @@ export default defineComponent({
       this.input = {
         name: "",
         price: 0,
+        stock: 0,
         available: false,
       };
     },
     async addItem(input: Input) {
+      // @ts-ignore
       let checkValid = await this.$refs.newItem.validate();
       if (checkValid.valid) {
         this.loading = true;

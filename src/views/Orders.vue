@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <PreOrder />
+    <PreOrder :admin="admin" />
     <v-container>
       <v-row>
         <v-col v-for="(order, index) in orders" :key="index">
@@ -40,17 +40,15 @@ export default defineComponent({
         try {
           const q = query(
             collection(db, "orders"),
-            where("user.uid", "==", user.uid)
+            where("email", "==", auth.currentUser?.email)
           );
           onSnapshot(q, (querySnapshot) => {
+            this.orders = [];
             querySnapshot.forEach((doc) => {
-              console.log(doc.data());
-              this.orders[doc.id] = doc.data();
+              this.orders.push(doc.data());
             });
           });
-        } catch {
-          console.log("error");
-        }
+        } catch (error) {}
       } else {
         this.$router.push("/login");
       }

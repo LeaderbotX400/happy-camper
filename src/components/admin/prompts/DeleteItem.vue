@@ -4,7 +4,7 @@
       v-model="deleteItemMenu"
       fullscreen
       width="300px"
-      height="220px"
+      height="120px"
       :overlay="true"
       transition="dialog-transition"
     >
@@ -13,11 +13,10 @@
           <v-icon>mdi-delete</v-icon> Delete
         </v-btn>
       </template>
+
       <v-card :disabled="loading" :loadind="loading">
-        <v-card-title>
-          Are you sure you want to delete this Item?
-        </v-card-title>
-        <v-card-text> Note: This action can not be undone </v-card-text>
+        <v-card-title> Delete {{ item?.name }}? </v-card-title>
+        <v-card-subtitle> This action cannot be undone. </v-card-subtitle>
         <v-card-actions>
           <v-btn color="success" @click="deleteItem()"> Yes </v-btn>
           <v-btn color="error" @click="deleteItemMenu = false"> No </v-btn>
@@ -35,7 +34,7 @@ import { httpsCallable } from "@firebase/functions";
 export default defineComponent({
   name: "DeleteItem",
   props: {
-    item: String,
+    item: Object,
   },
   data() {
     return {
@@ -45,10 +44,11 @@ export default defineComponent({
   },
   methods: {
     async deleteItem() {
+      this.loading = true;
       try {
-        this.deleteItemMenu = false;
         const deleteItem = httpsCallable(functions, "deleteItem");
         await deleteItem({ item: this.item });
+        this.deleteItemMenu = false;
       } catch (error) {
         console.log(error);
       }

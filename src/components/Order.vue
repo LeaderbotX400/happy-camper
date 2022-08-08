@@ -68,7 +68,7 @@
         </v-row>
       </v-container>
     </v-card-text>
-    <v-code class="ma-4" v-if="rawData">
+    <v-code class="ma-2" v-if="rawData">
       <h3>Raw data:</h3>
       <pre>{{ order }}</pre>
     </v-code>
