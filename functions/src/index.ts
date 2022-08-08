@@ -50,8 +50,8 @@ export const deleteItem = functions.https.onCall(async (data, context) => {
   }
   if (context.auth?.token.admin !== true) {
     throw new functions.https.HttpsError(
-      "permission-denied",
-      "You must be an administator to do this"
+        "permission-denied",
+        "You must be an administator to do this"
     );
   }
   const batch = admin.firestore().batch();
@@ -75,8 +75,8 @@ export const updateItem = functions.https.onCall(async (data, context) => {
   }
   if (context.auth?.token.admin !== true) {
     throw new functions.https.HttpsError(
-      "permission-denied",
-      "You must be an administator to do this"
+        "permission-denied",
+        "You must be an administator to do this"
     );
   }
   const batch = admin.firestore().batch();
@@ -125,7 +125,7 @@ export const submitOrder = functions.https.onCall(async (data, context) => {
   // update user stats
   await admin.firestore().runTransaction(async (t) => {
     const doc = await t.get(
-      admin.firestore().doc(`users/${context.auth?.uid}`)
+        admin.firestore().doc(`users/${context.auth?.uid}`)
     );
     const user = doc.data();
     if (user == undefined) {
@@ -178,19 +178,19 @@ export const toggleAdmin = functions.https.onCall(async (data, context) => {
   }
   if (context.auth?.token.admin !== true) {
     throw new functions.https.HttpsError(
-      "permission-denied",
-      "You must be an administator to do this"
+        "permission-denied",
+        "You must be an administator to do this"
     );
   }
   const user = await admin.auth().getUserByEmail(data.email);
   await admin
-    .auth()
-    .setCustomUserClaims(user.uid, {
-      admin: data.admin,
-    })
-    .catch((err) => {
-      throw new functions.https.HttpsError("internal", err.message);
-    });
+      .auth()
+      .setCustomUserClaims(user.uid, {
+        admin: data.admin,
+      })
+      .catch((err) => {
+        throw new functions.https.HttpsError("internal", err.message);
+      });
   const batch = admin.firestore().batch();
   batch.update(admin.firestore().doc(`users/${user.uid}`), {
     roles: {
