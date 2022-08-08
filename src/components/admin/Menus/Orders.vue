@@ -81,10 +81,12 @@
             </v-row>
             <v-row>
               <v-col>
-                <v-code class="ma-2" v-if="rawData[index]">
-                  <h3>Raw data:</h3>
-                  <pre>{{ order }}</pre>
-                </v-code>
+                <v-expand-transition>
+                  <v-code class="ma-2" v-if="rawData[index]">
+                    <h3>Raw data:</h3>
+                    <pre>{{ order }}</pre>
+                  </v-code>
+                </v-expand-transition>
               </v-col>
             </v-row>
           </v-container>

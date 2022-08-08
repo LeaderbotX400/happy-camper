@@ -1,6 +1,10 @@
 <template>
-  <v-card max-width="300">
+  <v-card max-width="300" :disabled="loading">
     <div class="text-center">
+      <v-alert v-if="error.status">
+        <v-icon color="red">mdi-alert</v-icon>
+        {{ error.message }}
+      </v-alert>
       <v-card-title>
         {{ item.name }}
         <v-menu :close-on-content-click="false">
@@ -70,28 +74,36 @@
         </v-row>
       </v-card-text>
       <v-card-actions>
-        <v-btn color="primary" @click="updateItem()"> Update </v-btn>
+        <v-btn color="primary" @click="updateItem()" :loading="loading">
+          Update
+        </v-btn>
         <DeleteItem :item="item"></DeleteItem>
       </v-card-actions>
     </div>
-    <v-code v-if="rawData" class="ma-2">
-      <h3>Raw Data:</h3>
-      <pre>{{ item }}</pre>
-    </v-code>
+    <v-expand-transition>
+      <v-code v-if="rawData" class="ma-2">
+        <h3>Raw Data:</h3>
+        <pre>{{ item }}</pre>
+      </v-code>
+    </v-expand-transition>
   </v-card>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { db } from "@/firebase";
-import { doc, updateDoc } from "@firebase/firestore";
-import DeleteItem from "./prompts/DeleteItem.vue";
+import { defineComponent, defineAsyncComponent } from "vue";
+import { functions } from "@/firebase";
+import { httpsCallable } from "@firebase/functions";
 
 export default defineComponent({
   name: "Item",
   data() {
     return {
       rawData: false,
+      loading: false,
+      error: {
+        status: false as boolean,
+        message: "" as string,
+      },
     };
   },
   props: {
@@ -109,18 +121,23 @@ export default defineComponent({
     },
   },
   components: {
-    DeleteItem,
+    DeleteItem: defineAsyncComponent(
+      () => import("@/components/admin/components/prompts/DeleteItem.vue")
+    ),
   },
   methods: {
     async updateItem() {
-      console.log(this.items);
+      this.loading = true;
       try {
-        await updateDoc(doc(db, "data/items"), {
+        const updateItem = httpsCallable(functions, "updateItem");
+        await updateItem({
           items: this.items,
         });
       } catch (error) {
-        console.log(error);
+        this.error.status = true as boolean;
+        this.error.message = error as string;
       }
+      this.loading = false;
     },
   },
 });

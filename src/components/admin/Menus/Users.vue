@@ -1,0 +1,37 @@
+<template>
+  <v-container>
+    <v-row>
+      <v-col v-for="user in users" :key="user">
+        <User :user="user" />
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+
+<script lang="ts">
+import { defineComponent, defineAsyncComponent } from "vue";
+import { db } from "@/firebase";
+import { onSnapshot, collection } from "@firebase/firestore";
+
+export default defineComponent({
+  name: "Users",
+  components: {
+    User: defineAsyncComponent(
+      () => import("@/components/admin/components/User.vue")
+    ),
+  },
+  data() {
+    return {
+      users: [] as any,
+    };
+  },
+  mounted() {
+    onSnapshot(collection(db, "users"), (querySnapshot) => {
+      this.users = [];
+      querySnapshot.forEach((doc) => {
+        this.users.push(doc.data());
+      });
+    });
+  },
+});
+</script>

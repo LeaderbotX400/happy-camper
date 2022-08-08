@@ -78,11 +78,6 @@
               <v-card-title>total: ${{ total }} </v-card-title>
             </v-row>
           </v-container>
-          <v-code class="ma-2" v-if="rawData">
-            <h3>Raw data:</h3>
-            <pre>Items: {{ selection }}</pre>
-            <pre>Stock check: {{ checkStock }}</pre>
-          </v-code>
           <v-card-actions>
             <v-btn
               :loading="loading"
@@ -94,6 +89,13 @@
             </v-btn>
             <v-btn color="red" @click="cancel()">Cancel</v-btn>
           </v-card-actions>
+          <v-expand-transition>
+            <v-code class="ma-2" v-if="rawData">
+              <h3>Raw data:</h3>
+              <pre>Items: {{ selection }}</pre>
+              <pre>Stock check: {{ checkStock }}</pre>
+            </v-code>
+          </v-expand-transition>
         </v-card>
       </v-dialog>
     </v-btn>

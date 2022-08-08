@@ -14,19 +14,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, defineAsyncComponent } from "vue";
 import { db } from "@/firebase";
 import { doc, onSnapshot } from "@firebase/firestore";
-import AddItem from "./prompts/AddItem.vue";
-import DeleteItem from "./prompts/DeleteItem.vue";
-import Item from "./Item.vue";
 
 export default defineComponent({
   name: "Item Menu",
   components: {
-    AddItem,
-    DeleteItem,
-    Item,
+    AddItem: defineAsyncComponent(
+      () => import("@/components/admin/components/prompts/AddItem.vue")
+    ),
+    Item: defineAsyncComponent(
+      () => import("@/components/admin/components/Item.vue")
+    ),
   },
   data() {
     return {

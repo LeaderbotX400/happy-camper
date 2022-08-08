@@ -14,14 +14,16 @@
             <v-img :src="user.photoURL" alt="Avatar" />
           </v-avatar>
           <h3>{{ user.displayName }}</h3>
-          <p class="text-caption mt-1">{{ user.email }}</p>
-          <v-divider class="my-3" />
-          <router-link
-            to="/admin"
-            style="text-decoration: none; color: inherit"
-          >
-            <v-btn rounded variant="text">admin menu</v-btn>
-          </router-link>
+          <p class="text-caption mt-1">{{ user.metadata.email }}</p>
+          <div v-if="admin">
+            <v-divider class="my-3" />
+            <router-link
+              to="/admin"
+              style="text-decoration: none; color: inherit"
+            >
+              <v-btn rounded variant="text">admin menu</v-btn>
+            </router-link>
+          </div>
           <v-divider class="my-3" />
           <v-btn rounded variant="text" @click="logout()"> logout </v-btn>
         </div>

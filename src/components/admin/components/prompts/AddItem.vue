@@ -132,7 +132,6 @@ export default defineComponent({
           this.cancel();
         } catch (error) {
           this.error = error;
-          console.log(error);
         }
         this.loading = false;
       }
