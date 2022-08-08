@@ -4,15 +4,14 @@ service cloud.firestore {
     function checkAdmin() {
       return request.auth.uid != null && request.auth.token.admin == true && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.admin == true;
     }
-    match /data/items {
+    match /data/{document=**} {
       allow read: if request.auth.uid != null;
-      allow update: if checkAdmin() && (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['items']));
     }
     match /data/users/{userId} {
-      allow read: if request.auth.uid == userId;
+      allow read: if request.auth.uid != null && request.auth.uid == userId;
     }
     match /orders/{orderId} {
-      allow read: if request.auth.uid == userId || checkAdmin();
+      allow read: if request.auth.uid != null && request.auth.uid == userId || checkAdmin();
       allow update: if checkAdmin();
     }
 
