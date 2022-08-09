@@ -2,13 +2,14 @@
   <v-container class="text-center">
     <v-btn color="primary">
       New Pre-Order
-      <v-dialog
-        :fullscreen="mobile"
-        v-model="dialog"
-        activator="parent"
-        max-width="600"
-      >
+      <v-dialog :fullscreen="mobile" v-model="dialog" activator="parent">
         <v-card :disabled="loading" :loading="loading">
+          <v-alert v-if="error.status">
+            <v-alert-title color="error">
+              <v-icon color="yellow">mdi-warning</v-icon>
+              {{ error.message }}
+            </v-alert-title>
+          </v-alert>
           <v-card-title>
             <span class="headline">New Pre-Order</span>
           </v-card-title>
@@ -152,7 +153,10 @@ export default defineComponent({
           (v: any) => v > 0 || "Quantity must be greater than 0",
         ],
       },
-      error: false as boolean,
+      error: {
+        status: false,
+        message: "",
+      },
       rawData: false as boolean,
     };
   },
@@ -215,14 +219,18 @@ export default defineComponent({
 
       try {
         const callable = httpsCallable(functions, "submitOrder");
-        const result = await callable({
+        await callable({
           items: items,
           total: this.total,
         });
+        this.cancel();
       } catch (error) {
-        console.log(error);
+        this.error = {
+          status: true,
+          message: error as string,
+        };
       }
-      this.cancel();
+      this.loading = false;
     },
     cancel() {
       for (const item in this.selection) {
@@ -231,6 +239,10 @@ export default defineComponent({
       }
       this.loading = false;
       this.dialog = false;
+      this.error = {
+        status: false,
+        message: "",
+      };
     },
   },
   mounted() {

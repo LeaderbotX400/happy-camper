@@ -8,20 +8,20 @@
     </v-alert>
     <v-card-title>
       <v-avatar size="40">
-        <v-img :src="user.data.photoURL" />
+        <v-img :src="user.data?.photoURL" />
       </v-avatar>
-      {{ user.data.email }}
+      {{ user.data?.email }}
       <v-menu :close-on-content-click="false" v-if="dev">
         <template v-slot:activator="{ props }">
           <v-btn icon v-bind="props" variant="plain">
             <v-icon>mdi-dots-vertical</v-icon>
           </v-btn>
         </template>
-        <v-card width="150">
+        <v-card width="172">
           <v-card-subtitle class="text-center">
             <v-icon>mdi-hard-hat</v-icon> Dev options
           </v-card-subtitle>
-
+          <DeleteUser :user="user" />
           <v-switch
             class="ml-4"
             color="primary"
@@ -68,6 +68,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import ToggleAdmin from "@/components/admin/components/prompts/ToggleAdmin.vue";
+import DeleteUser from "./prompts/DeleteUser.vue";
 
 interface User {
   data: {
@@ -98,6 +99,7 @@ export default defineComponent({
   },
   components: {
     ToggleAdmin,
+    DeleteUser,
   },
   data() {
     return {
