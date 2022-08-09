@@ -14,7 +14,7 @@
             <v-img :src="user.photoURL" alt="Avatar" />
           </v-avatar>
           <h3>{{ user.displayName }}</h3>
-          <p class="text-caption mt-1">{{ user.metadata.email }}</p>
+          <p class="text-caption mt-1">{{ user.email }}</p>
           <div v-if="admin">
             <v-divider class="my-3" />
             <router-link

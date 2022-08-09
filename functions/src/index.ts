@@ -13,15 +13,21 @@ interface Item {
 }
 
 export const addItem = functions.https.onCall(async (data, context) => {
-  if (context == null) {
+  if (context.app == undefined) {
     throw new functions.https.HttpsError("permission-denied", "Unknown origin");
+  }
+  if (context.auth?.token.admin !== true) {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "You must be an administator to do this"
+    );
   }
 
   console.log(data);
   const item = {
     name: data.name as string,
-    price: data.price as number,
-    stock: data.stock as number,
+    price: Number(data.price),
+    stock: Number(data.stock),
     stats: {
       totalSold: 0 as number,
     },
@@ -30,13 +36,6 @@ export const addItem = functions.https.onCall(async (data, context) => {
   const batch = admin.firestore().batch();
   batch.update(admin.firestore().doc("data/items"), {
     items: admin.firestore.FieldValue.arrayUnion(item),
-  });
-
-  batch.update(admin.firestore().doc("data/stats"), {
-    items: admin.firestore.FieldValue.arrayUnion({
-      name: data.name,
-      sold: 0,
-    }),
   });
 
   return batch.commit().catch((err) => {
@@ -50,19 +49,13 @@ export const deleteItem = functions.https.onCall(async (data, context) => {
   }
   if (context.auth?.token.admin !== true) {
     throw new functions.https.HttpsError(
-        "permission-denied",
-        "You must be an administator to do this"
+      "permission-denied",
+      "You must be an administator to do this"
     );
   }
   const batch = admin.firestore().batch();
   batch.update(admin.firestore().doc("data/items"), {
     items: admin.firestore.FieldValue.arrayRemove(data.item),
-  });
-  batch.update(admin.firestore().doc("data/stats"), {
-    items: admin.firestore.FieldValue.arrayRemove({
-      name: data.item.name,
-      sold: 0,
-    }),
   });
   return batch.commit().catch((err) => {
     return err;
@@ -75,8 +68,8 @@ export const updateItem = functions.https.onCall(async (data, context) => {
   }
   if (context.auth?.token.admin !== true) {
     throw new functions.https.HttpsError(
-        "permission-denied",
-        "You must be an administator to do this"
+      "permission-denied",
+      "You must be an administator to do this"
     );
   }
   const batch = admin.firestore().batch();
@@ -96,11 +89,11 @@ export const submitOrder = functions.https.onCall(async (data, context) => {
   const docRef = admin.firestore().collection("orders").doc();
   const batch = admin.firestore().batch();
   batch.set(docRef, {
-    completed: false,
+    completed: false as boolean,
     items: data.items,
-    total: data.total,
+    total: data.total as number,
     created: admin.firestore.FieldValue.serverTimestamp(),
-    email: context.auth?.token.email,
+    email: context.auth?.token.email as string,
   });
   // update item stats
   await admin.firestore().runTransaction(async (t) => {
@@ -112,9 +105,9 @@ export const submitOrder = functions.https.onCall(async (data, context) => {
     const newItems = items.map((item: Item) => {
       const index = data.items.findIndex((i: Item) => i.name === item.name);
       if (index !== -1) {
-        item.stock -= data.items[index].quantity as number;
+        item.stock -= Number(data.items[index].quantity);
         item.available = (item.stock > 0) as boolean;
-        item.stats.totalSold += data.items[index].quantity as number;
+        item.stats.totalSold += Number(data.items[index].quantity);
       }
       return item;
     });
@@ -125,7 +118,7 @@ export const submitOrder = functions.https.onCall(async (data, context) => {
   // update user stats
   await admin.firestore().runTransaction(async (t) => {
     const doc = await t.get(
-        admin.firestore().doc(`users/${context.auth?.uid}`)
+      admin.firestore().doc(`users/${context.auth?.uid}`)
     );
     const user = doc.data();
     if (user == undefined) {
@@ -139,7 +132,7 @@ export const submitOrder = functions.https.onCall(async (data, context) => {
     batch.update(admin.firestore().doc(`users/${context.auth?.uid}`), {
       stats: {
         totalOrders: admin.firestore.FieldValue.increment(1),
-        totalSpent: user.stats.totalSpent + data.total,
+        totalSpent: Number(user.stats.totalSpent + data.total),
       },
     });
   });
@@ -151,18 +144,18 @@ export const submitOrder = functions.https.onCall(async (data, context) => {
 export const newUser = functions.auth.user().onCreate(async (user) => {
   const batch = admin.firestore().batch();
   batch.set(admin.firestore().doc(`users/${user.uid}`), {
-    metadata: {
-      photoURL: user.photoURL,
-      displayName: user.displayName,
-      email: user.email,
+    data: {
+      photoURL: user.photoURL as string,
+      displayName: user.displayName as string,
+      email: user.email as string,
       created: admin.firestore.FieldValue.serverTimestamp(),
     },
 
-    orders: [],
+    orders: [] as string[],
 
     stats: {
-      totalOrders: 0,
-      totalSpent: 0,
+      totalOrders: 0 as number,
+      totalSpent: 0 as number,
     },
 
     roles: {},
@@ -178,23 +171,23 @@ export const toggleAdmin = functions.https.onCall(async (data, context) => {
   }
   if (context.auth?.token.admin !== true) {
     throw new functions.https.HttpsError(
-        "permission-denied",
-        "You must be an administator to do this"
+      "permission-denied",
+      "You must be an administator to do this"
     );
   }
   const user = await admin.auth().getUserByEmail(data.email);
   await admin
-      .auth()
-      .setCustomUserClaims(user.uid, {
-        admin: data.admin,
-      })
-      .catch((err) => {
-        throw new functions.https.HttpsError("internal", err.message);
-      });
+    .auth()
+    .setCustomUserClaims(user.uid, {
+      admin: data.admin as boolean,
+    })
+    .catch((err) => {
+      throw new functions.https.HttpsError("internal", err.message);
+    });
   const batch = admin.firestore().batch();
   batch.update(admin.firestore().doc(`users/${user.uid}`), {
     roles: {
-      admin: data.admin,
+      admin: data.admin as boolean,
     },
   });
   return batch.commit().catch((err) => {

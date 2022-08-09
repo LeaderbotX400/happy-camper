@@ -1,5 +1,5 @@
 <template>
-  <v-card max-width="300" :disabled="loading">
+  <v-card max-width="300" :disabled="loading" :loading="loading">
     <div class="text-center">
       <v-alert v-if="error.status">
         <v-icon color="red">mdi-alert</v-icon>
@@ -94,6 +94,16 @@ import { defineComponent, defineAsyncComponent } from "vue";
 import { functions } from "@/firebase";
 import { httpsCallable } from "@firebase/functions";
 
+interface Item {
+  name: string;
+  price: number;
+  stock: number;
+  available: boolean;
+  stats: {
+    totalSold: number;
+  };
+}
+
 export default defineComponent({
   name: "Item",
   data() {
@@ -129,9 +139,21 @@ export default defineComponent({
     async updateItem() {
       this.loading = true;
       try {
+        let newItems: Object[] = [];
+        this.items.forEach((item: any) => {
+          newItems.push({
+            name: item.name,
+            price: Number(item.price),
+            stock: Number(item.stock),
+            available: item.available,
+            stats: {
+              totalSold: item.stats.totalSold,
+            },
+          });
+        });
         const updateItem = httpsCallable(functions, "updateItem");
         await updateItem({
-          items: this.items,
+          items: newItems,
         });
       } catch (error) {
         this.error.status = true as boolean;

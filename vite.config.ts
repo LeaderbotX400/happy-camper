@@ -20,7 +20,6 @@ export default defineConfig({
     mkcert(),
     terser({
       compress: {
-        drop_console: true,
         unsafe_arrows: true,
         unsafe_comps: true,
         passes: 2,

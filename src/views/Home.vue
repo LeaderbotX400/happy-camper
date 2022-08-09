@@ -1,7 +1,7 @@
 <template>
   <v-container align="center" justify="center">
     <v-card width="200" height="200">
-      <v-card-text>Please wait...</v-card-text>
+      <v-card-text>Redirecting to login Please wait...</v-card-text>
       <v-progress-circular indeterminate />
     </v-card>
   </v-container>

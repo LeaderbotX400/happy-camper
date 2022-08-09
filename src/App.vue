@@ -6,6 +6,7 @@
       <UserMenu />
     </v-app-bar>
     <v-main>
+      <ToggleAdmin :user="user" />
       <router-view />
     </v-main>
   </v-app>
@@ -14,11 +15,15 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import UserMenu from "@/components/UserMenu.vue";
-
 export default defineComponent({
   name: "App",
   components: {
     UserMenu,
+  },
+  data() {
+    return {
+      user: <any>{},
+    };
   },
 });
 </script>

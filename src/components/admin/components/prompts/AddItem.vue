@@ -2,18 +2,18 @@
   <v-dialog
     v-model="inputMenu"
     fullscreen
-    max-width="500px"
-    max-height="340px"
     :overlay="true"
+    max-width="500"
+    max-height="500"
     persistent
     transition="dialog-transition"
   >
     <template v-slot:activator="{ props }">
       <v-btn color="primary" v-bind="props"> Add Item </v-btn>
     </template>
-    <v-card color="white" :disabled="loading" :loading="loading">
-      <v-alert v-if="error != null" color="error">
-        {{ error }}
+    <v-card color="white" :disabled="loading" :loading="loading" fullscreen>
+      <v-alert v-if="error.status" color="error" max-height="100">
+        {{ error.message }}
       </v-alert>
 
       <v-card-title primary-title> Add New Item </v-card-title>
@@ -63,7 +63,7 @@
               <v-switch
                 v-model="input.available"
                 default="true"
-                label="Item is Available"
+                :label="input.available ? 'Available' : 'Unavailable'"
                 color="primary"
               />
             </v-col>
@@ -96,10 +96,10 @@ export default defineComponent({
   data() {
     return {
       input: <Input>{
-        name: "",
-        price: 0,
-        stock: 0,
-        available: false,
+        name: "" as string,
+        price: 0 as number,
+        stock: 0 as number,
+        available: false as boolean,
       },
       loading: false,
       props: false,
@@ -109,29 +109,36 @@ export default defineComponent({
         stock: [(v: any) => !!v || "Stock amount is required"],
       },
       inputMenu: false,
-      error: null as any,
+      error: {
+        status: false as boolean,
+        message: "" as string,
+      },
     };
   },
   methods: {
     cancel() {
       this.inputMenu = false;
       this.input = {
-        name: "",
-        price: 0,
-        stock: 0,
-        available: false,
+        name: "" as string,
+        price: 0 as number,
+        stock: 0 as number,
+        available: false as boolean,
       };
     },
     async addItem(input: Input) {
       // @ts-ignore
       let checkValid = await this.$refs.newItem.validate();
       if (checkValid.valid) {
-        this.loading = true;
+        this.loading = true as boolean;
         try {
           await httpsCallable(functions, "addItem")(input);
           this.cancel();
         } catch (error) {
-          this.error = error;
+          console.log(error);
+          this.error = {
+            status: true as boolean,
+            message: error as string,
+          };
         }
         this.loading = false;
       }

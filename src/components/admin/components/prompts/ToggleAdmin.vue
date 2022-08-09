@@ -39,7 +39,7 @@
         <v-btn
           color="primary"
           text
-          @click="toggleAdmin(user.metadata.email)"
+          @click="toggleAdmin(user.data.email)"
           :loading="loading.dialog"
         >
           OK
@@ -59,7 +59,7 @@ interface User {
     admin: boolean;
     developer: boolean;
   };
-  metadata: {
+  data: {
     email: string;
   };
 }

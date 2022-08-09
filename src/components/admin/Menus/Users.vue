@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col v-for="user in users" :key="user">
-        <User :user="user" />
+        <User :user="user" :dev="dev" />
       </v-col>
     </v-row>
   </v-container>
@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from "vue";
-import { db } from "@/firebase";
+import { auth, db } from "@/firebase";
 import { onSnapshot, collection } from "@firebase/firestore";
 
 export default defineComponent({
@@ -23,9 +23,15 @@ export default defineComponent({
   data() {
     return {
       users: [] as any,
+      dev: false as boolean,
     };
   },
   mounted() {
+    auth.currentUser?.getIdTokenResult().then((idTokenResult) => {
+      if (idTokenResult.claims.dev) {
+        this.dev = true;
+      }
+    });
     onSnapshot(collection(db, "users"), (querySnapshot) => {
       this.users = [];
       querySnapshot.forEach((doc) => {
