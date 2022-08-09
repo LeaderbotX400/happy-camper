@@ -2,7 +2,7 @@
   <v-card max-width="500">
     <v-card-title>
       {{ date(order.created) }}
-      <div class="float-right" v-if="admin">
+      <div class="float-right" v-if="dev">
         <v-menu :close-on-content-click="false">
           <template v-slot:activator="{ props }">
             <v-btn icon v-bind="props" variant="plain">
@@ -91,7 +91,7 @@ export default defineComponent({
       type: Number,
       required: true,
     },
-    admin: {
+    dev: {
       type: Boolean,
       required: true,
     },

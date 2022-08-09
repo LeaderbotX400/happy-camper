@@ -8,10 +8,10 @@
     </v-alert>
     <v-card-title>
       <v-avatar size="40">
-        <v-img :src="user.metadata.photoURL" />
+        <v-img :src="user.data.photoURL" />
       </v-avatar>
-      {{ user.metadata.email }}
-      <v-menu :close-on-content-click="false">
+      {{ user.data.email }}
+      <v-menu :close-on-content-click="false" v-if="dev">
         <template v-slot:activator="{ props }">
           <v-btn icon v-bind="props" variant="plain">
             <v-icon>mdi-dots-vertical</v-icon>
@@ -66,11 +66,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, defineAsyncComponent } from "vue";
+import { defineComponent } from "vue";
 import ToggleAdmin from "@/components/admin/components/prompts/ToggleAdmin.vue";
 
 interface User {
-  metadata: {
+  data: {
     email: string;
     photoURL: string;
   };
@@ -89,6 +89,10 @@ export default defineComponent({
   props: {
     user: {
       type: Object as () => User,
+      required: true,
+    },
+    dev: {
+      type: Boolean,
       required: true,
     },
   },

@@ -46,7 +46,7 @@
                 </v-list>
               </v-col>
               <div class="float">
-                <v-menu :close-on-content-click="false">
+                <v-menu :close-on-content-click="false" v-if="dev">
                   <template v-slot:activator="{ props }">
                     <v-btn icon v-bind="props" variant="plain">
                       <v-icon>mdi-dots-vertical</v-icon>
@@ -107,7 +107,7 @@ export default defineComponent({
     return {
       orders: <any>{},
       loggedIn: false,
-      admin: false as any,
+      dev: false as any,
       rawData: {} as any,
     };
   },
@@ -122,6 +122,9 @@ export default defineComponent({
     auth.onAuthStateChanged((user) => {
       if (user) {
         user?.getIdTokenResult().then((idTokenResult) => {
+          if (idTokenResult.claims?.dev) {
+            this.dev = true;
+          }
           if (!idTokenResult.claims.admin) {
             this.$router.push("/");
           }

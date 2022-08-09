@@ -13,7 +13,7 @@
             <span class="headline">New Pre-Order</span>
           </v-card-title>
           <v-container fluid>
-            <div class="float-right" v-if="admin">
+            <div class="float-right" v-if="dev">
               <v-menu :close-on-content-click="false">
                 <template v-slot:activator="{ props }">
                   <v-btn icon v-bind="props" variant="plain">
@@ -135,7 +135,7 @@ export default defineComponent({
     return { mobile };
   },
   props: {
-    admin: {
+    dev: {
       type: Boolean,
       default: false,
     },

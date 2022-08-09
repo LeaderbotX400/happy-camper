@@ -1,10 +1,10 @@
 <template>
   <v-container>
-    <PreOrder :admin="admin" />
+    <PreOrder :dev="dev" />
     <v-container>
       <v-row>
         <v-col v-for="(order, index) in orders" :key="index">
-          <Order :order="order" :index="index" :admin="admin" />
+          <Order :order="order" :index="index" :dev="dev" />
         </v-col>
       </v-row>
     </v-container>
@@ -28,14 +28,14 @@ export default defineComponent({
     return {
       orders: <any>{},
       loggedIn: false,
-      admin: false as any,
+      dev: false as any,
     };
   },
   mounted() {
     auth.onAuthStateChanged((user) => {
       if (user) {
         user?.getIdTokenResult().then((idTokenResult) => {
-          this.admin = idTokenResult.claims.admin;
+          this.dev = idTokenResult.claims.dev;
         });
         try {
           const q = query(

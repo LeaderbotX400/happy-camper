@@ -5,7 +5,10 @@
         <h1>Login</h1>
       </v-card-title>
       <div id="firebaseui-auth-container"></div>
-      <div id="loader">Loading...</div>
+      <v-container id="loader" align="center">
+        loading...
+        <v-progress-circular indeterminate />
+      </v-container>
     </v-card>
   </v-container>
 </template>

@@ -14,11 +14,13 @@
         </v-btn>
       </template>
 
-      <v-card :disabled="loading" :loadind="loading">
+      <v-card :disabled="loading" :loading="loading">
         <v-card-title> Delete {{ item?.name }}? </v-card-title>
         <v-card-subtitle> This action cannot be undone. </v-card-subtitle>
         <v-card-actions>
-          <v-btn color="success" @click="deleteItem()"> Yes </v-btn>
+          <v-btn color="success" @click="deleteItem()" :loading="loading">
+            Yes
+          </v-btn>
           <v-btn color="error" @click="deleteItemMenu = false"> No </v-btn>
         </v-card-actions>
       </v-card>
