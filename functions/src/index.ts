@@ -18,8 +18,8 @@ export const addItem = functions.https.onCall(async (data, context) => {
   }
   if (context.auth?.token.admin !== true) {
     throw new functions.https.HttpsError(
-      "permission-denied",
-      "You must be an administator to do this"
+        "permission-denied",
+        "You must be an administator to do this"
     );
   }
 
@@ -49,8 +49,8 @@ export const deleteItem = functions.https.onCall(async (data, context) => {
   }
   if (context.auth?.token.admin !== true) {
     throw new functions.https.HttpsError(
-      "permission-denied",
-      "You must be an administator to do this"
+        "permission-denied",
+        "You must be an administator to do this"
     );
   }
   const batch = admin.firestore().batch();
@@ -68,8 +68,8 @@ export const updateItem = functions.https.onCall(async (data, context) => {
   }
   if (context.auth?.token.admin !== true) {
     throw new functions.https.HttpsError(
-      "permission-denied",
-      "You must be an administator to do this"
+        "permission-denied",
+        "You must be an administator to do this"
     );
   }
   const batch = admin.firestore().batch();
@@ -118,17 +118,12 @@ export const submitOrder = functions.https.onCall(async (data, context) => {
   // update user stats
   await admin.firestore().runTransaction(async (t) => {
     const doc = await t.get(
-      admin.firestore().doc(`users/${context.auth?.uid}`)
+        admin.firestore().doc(`users/${context.auth?.uid}`)
     );
     const user = doc.data();
     if (user == undefined) {
       throw new functions.https.HttpsError("internal", "No user found");
     }
-    const newOrders = user.orders;
-    newOrders.push(docRef.id);
-    batch.update(admin.firestore().doc(`users/${context.auth?.uid}`), {
-      orders: newOrders,
-    });
     batch.update(admin.firestore().doc(`users/${context.auth?.uid}`), {
       stats: {
         totalOrders: admin.firestore.FieldValue.increment(1),
@@ -171,24 +166,51 @@ export const toggleAdmin = functions.https.onCall(async (data, context) => {
   }
   if (context.auth?.token.admin !== true) {
     throw new functions.https.HttpsError(
-      "permission-denied",
-      "You must be an administator to do this"
+        "permission-denied",
+        "You must be an administator to do this"
     );
   }
   const user = await admin.auth().getUserByEmail(data.email);
   await admin
-    .auth()
-    .setCustomUserClaims(user.uid, {
-      admin: data.admin as boolean,
-    })
-    .catch((err) => {
-      throw new functions.https.HttpsError("internal", err.message);
-    });
+      .auth()
+      .setCustomUserClaims(user.uid, {
+        admin: data.admin as boolean,
+      })
+      .catch((err) => {
+        throw new functions.https.HttpsError("internal", err.message);
+      });
   const batch = admin.firestore().batch();
   batch.update(admin.firestore().doc(`users/${user.uid}`), {
     roles: {
       admin: data.admin as boolean,
     },
+  });
+  return batch.commit().catch((err) => {
+    return err;
+  });
+});
+
+export const deleteUser = functions.https.onCall(async (data, context) => {
+  if (context.app == undefined) {
+    throw new functions.https.HttpsError("permission-denied", "Unknown origin");
+  }
+  if (context.auth?.token.dev !== true && context.auth?.token.admin !== true) {
+    throw new functions.https.HttpsError(
+        "permission-denied",
+        "this is a dev only function"
+    );
+  }
+  const user = await admin.auth().getUserByEmail(data.email);
+  await admin.auth().deleteUser(user.uid);
+  const batch = admin.firestore().batch();
+  batch.delete(admin.firestore().doc(`users/${user.uid}`));
+  const orders = await admin
+      .firestore()
+      .collection("orders")
+      .where("email", "==", data.email)
+      .get();
+  orders.forEach((doc) => {
+    batch.delete(doc.ref);
   });
   return batch.commit().catch((err) => {
     return err;
