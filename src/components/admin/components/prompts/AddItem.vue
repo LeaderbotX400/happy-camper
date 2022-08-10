@@ -4,7 +4,7 @@
     fullscreen
     :overlay="true"
     max-width="500"
-    max-height="500"
+    :max-height="error.dialog ? 500 : 350"
     persistent
     transition="dialog-transition"
   >
@@ -12,7 +12,7 @@
       <v-btn color="primary" v-bind="props"> Add Item </v-btn>
     </template>
     <v-card color="white" :disabled="loading" :loading="loading" fullscreen>
-      <v-alert v-if="error.status" color="error" max-height="100">
+      <v-alert v-if="error.dialog" color="error" max-height="100">
         {{ error.message }}
       </v-alert>
 
@@ -110,7 +110,7 @@ export default defineComponent({
       },
       inputMenu: false,
       error: {
-        status: false as boolean,
+        dialog: false as boolean,
         message: "" as string,
       },
     };
@@ -131,12 +131,12 @@ export default defineComponent({
       if (checkValid.valid) {
         this.loading = true as boolean;
         try {
-          await httpsCallable(functions, "addItem")(input);
+          await httpsCallable(functions, "items-addItem")(input);
           this.cancel();
         } catch (error) {
           console.log(error);
           this.error = {
-            status: true as boolean,
+            dialog: true as boolean,
             message: error as string,
           };
         }

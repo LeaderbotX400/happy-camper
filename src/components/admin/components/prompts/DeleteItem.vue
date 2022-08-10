@@ -48,7 +48,7 @@ export default defineComponent({
     async deleteItem() {
       this.loading = true;
       try {
-        const deleteItem = httpsCallable(functions, "deleteItem");
+        const deleteItem = httpsCallable(functions, "items-deleteItem");
         await deleteItem({ item: this.item });
         this.deleteItemMenu = false;
       } catch (error) {

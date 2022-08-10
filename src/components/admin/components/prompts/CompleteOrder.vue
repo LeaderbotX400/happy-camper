@@ -1,17 +1,12 @@
 <template>
   <v-dialog>
     <template v-slot:activator="{ props }">
-      <v-btn
-        v-bind="props"
-        class="ma-2"
-        :color="user.roles.dev ? 'grey' : 'red'"
-        :disabled="user.roles.dev"
-        prepend-icon="mdi-delete-circle"
-      >
-        Delete User
+      <v-btn v-bind="props" :loading="loading.button">
+        <v-icon>mdi-check-circle</v-icon>
+        Complete Order
       </v-btn>
     </template>
-    <v-card :disabled="loading" :loading="loading">
+    <v-card :disabled="loading.dialog" :loading="loading.dialog">
       <v-alert v-if="error.dialog">
         <v-alert-title color="error">
           {{ error.message }}
@@ -19,15 +14,15 @@
       </v-alert>
       <v-card-title>Are you sure?</v-card-title>
       <v-card-text>
-        This will delete the user and all of their data. This action cannot be
-        undone.
+        <p>This will mark the order as complete and remove it from the list.</p>
+        <p>This action cannot be undone.</p>
       </v-card-text>
       <v-card-actions>
         <v-btn
           color="primary"
           text
-          @click="deleteUser(user.data.email)"
-          :loading="loading"
+          @click="completeOrder()"
+          :loading="loading.dialog"
         >
           OK
         </v-btn>
@@ -43,44 +38,53 @@ import { functions } from "@/firebase";
 import { httpsCallable } from "@firebase/functions";
 
 export default defineComponent({
-  name: "DeleteUser",
+  name: "CompleteOrder",
   props: {
-    user: {
-      type: Object,
+    index: {
+      type: String,
       required: true,
     },
   },
   data() {
     return {
-      loading: false,
       dialog: false,
       error: {
         dialog: false,
         message: "",
       },
+      loading: {
+        dialog: false,
+        button: false,
+      },
     };
   },
   methods: {
     cancel() {
-      this.loading = false;
       this.dialog = false;
+      this.loading = {
+        dialog: false,
+        button: false,
+      };
       this.error = {
         dialog: false,
         message: "",
       };
     },
-    async deleteUser(email: string) {
-      this.loading = true;
+    async completeOrder() {
+      this.loading.dialog = true;
       try {
-        const deleteUser = httpsCallable(functions, "deleteUser");
-        await deleteUser({ email });
+        const completeOrder = httpsCallable(functions, "orders-complete");
+        await completeOrder({
+          id: this.index,
+        });
       } catch (error) {
         this.error = {
           dialog: true,
           message: error as string,
         };
+      } finally {
+        this.loading.dialog = false;
       }
-      this.loading = false;
     },
   },
 });
