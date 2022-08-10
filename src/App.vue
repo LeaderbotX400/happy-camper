@@ -6,7 +6,6 @@
       <UserMenu />
     </v-app-bar>
     <v-main>
-      <ToggleAdmin :user="user" />
       <router-view />
     </v-main>
   </v-app>
