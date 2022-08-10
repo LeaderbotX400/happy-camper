@@ -81,7 +81,7 @@ interface User {
   };
   roles: {
     admin: boolean;
-    developer: boolean;
+    dev: boolean;
   };
 }
 

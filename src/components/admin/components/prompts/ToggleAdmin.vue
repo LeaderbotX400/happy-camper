@@ -14,11 +14,11 @@
         label="Administrator"
         v-bind="props"
         :model-value="user.roles?.admin"
-        :disabled="user.roles?.developer"
+        :disabled="user.roles?.dev"
         :loading="loading.switch"
         @click="(dialog = true), (loading.switch = true)"
         :messages="
-          user.roles.developer
+          user.roles.dev
             ? 'user is a developer and cannot be edited'
             : 'make user an administrator'
         "
@@ -57,7 +57,7 @@ import { httpsCallable } from "@firebase/functions";
 interface User {
   roles: {
     admin: boolean;
-    developer: boolean;
+    dev: boolean;
   };
   data: {
     email: string;

@@ -4,7 +4,8 @@
       <v-btn
         v-bind="props"
         class="ma-2"
-        color="red"
+        :color="user.roles.dev ? 'grey' : 'red'"
+        :disabled="user.roles.dev"
         prepend-icon="mdi-delete-circle"
       >
         Delete User
@@ -22,7 +23,6 @@
         undone.
       </v-card-text>
       <v-card-actions>
-        <v-btn color="red" text @click="cancel()"> Cancel </v-btn>
         <v-btn
           color="primary"
           text
@@ -31,6 +31,7 @@
         >
           OK
         </v-btn>
+        <v-btn color="red" text @click="cancel()"> Cancel </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
