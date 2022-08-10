@@ -24,8 +24,6 @@ export const newUser = functions.auth.user().onCreate(async (user) => {
       created: admin.firestore.FieldValue.serverTimestamp(),
     },
 
-    orders: [] as string[],
-
     stats: {
       totalOrders: 0 as number,
       totalSpent: 0 as number,
