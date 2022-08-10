@@ -7,8 +7,8 @@ export const addItem = functions.https.onCall(async (data, context) => {
   }
   if (context.auth?.token.admin !== true) {
     throw new functions.https.HttpsError(
-        "permission-denied",
-        "You must be an administrator to do this"
+      "permission-denied",
+      "You must be an administrator to do this"
     );
   }
 
@@ -38,8 +38,8 @@ export const deleteItem = functions.https.onCall(async (data, context) => {
   }
   if (context.auth?.token.admin !== true) {
     throw new functions.https.HttpsError(
-        "permission-denied",
-        "You must be an administrator to do this"
+      "permission-denied",
+      "You must be an administrator to do this"
     );
   }
   const batch = admin.firestore().batch();
@@ -57,8 +57,8 @@ export const updateItem = functions.https.onCall(async (data, context) => {
   }
   if (context.auth?.token.admin !== true) {
     throw new functions.https.HttpsError(
-        "permission-denied",
-        "You must be an administrator to do this"
+      "permission-denied",
+      "You must be an administrator to do this"
     );
   }
   const batch = admin.firestore().batch();

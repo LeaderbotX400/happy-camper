@@ -19,6 +19,7 @@ module.exports = {
   },
   ignorePatterns: [
     "/lib/**/*", // Ignore built files.
+    "/src/billing/**/*", // Ignore billing files.
   ],
   plugins: [
     "@typescript-eslint",
@@ -27,5 +28,7 @@ module.exports = {
   rules: {
     "quotes": ["error", "double"],
     "import/no-unresolved": 0,
+    "object-curly-spacing": ["error", "always"],
+    "indent": ["error", 2],
   },
 };
