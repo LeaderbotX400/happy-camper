@@ -19,8 +19,8 @@ export const submit = functions.https.onCall(async (data, context) => {
   // only allow logged in users to submit orders
   if (context.auth == undefined) {
     throw new functions.https.HttpsError(
-        "permission-denied",
-        "You must be logged in to do this"
+      "permission-denied",
+      "You must be logged in to do this"
     );
   }
   const docRef = admin.firestore().collection("orders").doc();
@@ -55,7 +55,7 @@ export const submit = functions.https.onCall(async (data, context) => {
   // update user stats
   await admin.firestore().runTransaction(async (t) => {
     const doc = await t.get(
-        admin.firestore().doc(`users/${context.auth?.uid}`)
+      admin.firestore().doc(`users/${context.auth?.uid}`)
     );
     const user = doc.data();
     if (user == undefined) {
@@ -79,20 +79,20 @@ export const complete = functions.https.onCall(async (data, context) => {
   }
   if (context.auth == undefined) {
     throw new functions.https.HttpsError(
-        "permission-denied",
-        "You must be logged in to do this"
+      "permission-denied",
+      "You must be logged in to do this"
     );
   }
   if (context.auth?.token.admin !== true) {
     throw new functions.https.HttpsError(
-        "permission-denied",
-        "You must be an administrator to do this"
+      "permission-denied",
+      "You must be an administrator to do this"
     );
   }
   if (data.id == undefined || data.id == "") {
     throw new functions.https.HttpsError(
-        "invalid-argument",
-        "You must provide an order id"
+      "invalid-argument",
+      "You must provide an order id"
     );
   }
   const batch = admin.firestore().batch();

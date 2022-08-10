@@ -28,9 +28,9 @@ const appCheck = initializeAppCheck(app, {
   isTokenAutoRefreshEnabled: true,
 });
 
-// if (import.meta.env.MODE == "development") {
-//   connectFirestoreEmulator(db, "localhost", 8080);
-//   connectFunctionsEmulator(functions, "localhost", 5001);
-// }
+if (import.meta.env.MODE == "development") {
+  connectFirestoreEmulator(db, "localhost", 8080);
+  connectFunctionsEmulator(functions, "localhost", 5001);
+}
 
 export { app, analytics, auth, db, functions, performance, appCheck };
