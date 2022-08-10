@@ -2,9 +2,16 @@
   <v-container>
     <v-card>
       <v-card-title>
+        <v-alert v-if="error.dialog">
+          <v-alert-title>
+            {{ error.message }}
+          </v-alert-title>
+        </v-alert>
         <h2>Orders</h2>
       </v-card-title>
-      <v-card-text v-if="orders.length <= 0"> No orders yet. </v-card-text>
+      <v-card-text v-if="orders.length <= 0 || orders.length == undefined">
+        No orders yet.
+      </v-card-text>
     </v-card>
     <v-expansion-panels>
       <v-expansion-panel v-for="(order, index) in orders" :key="index">
@@ -70,10 +77,7 @@
             </v-row>
             <v-row v-if="!order.completed">
               <v-col>
-                <CompleteOrder
-                  :index="(index as any)"
-                  @complete="completeOrder"
-                />
+                <CompleteOrder :index="(index as any)" />
               </v-col>
             </v-row>
             <v-row>
@@ -96,7 +100,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { auth, db } from "@/firebase";
-import { doc, onSnapshot, collection, updateDoc } from "@firebase/firestore";
+import { doc, onSnapshot, collection, query, where } from "@firebase/firestore";
 import CompleteOrder from "@/components/admin/components/prompts/CompleteOrder.vue";
 
 export default defineComponent({
@@ -110,14 +114,11 @@ export default defineComponent({
       loggedIn: false,
       dev: false as any,
       rawData: {} as any,
+      error: {
+        dialog: false,
+        message: "",
+      },
     };
-  },
-  methods: {
-    async completeOrder(docId: any) {
-      await updateDoc(doc(db, "orders", docId), {
-        completed: true,
-      });
-    },
   },
   mounted() {
     auth.onAuthStateChanged((user) => {
@@ -131,15 +132,22 @@ export default defineComponent({
           }
         });
         try {
-          onSnapshot(collection(db, "orders"), (querySnapshot) => {
+          const q = query(
+            collection(db, "orders"),
+            where("completed", "==", false)
+          );
+          onSnapshot(q, (querySnapshot) => {
             this.orders = {};
             querySnapshot.forEach((doc) => {
               this.orders[doc.id] = doc.data();
               this.rawData[doc.id] = false;
             });
           });
-        } catch {
-          console.log("error");
+        } catch (error) {
+          this.error = {
+            dialog: true,
+            message: error as string,
+          };
         }
       } else {
         this.$router.push("/");
