@@ -1,0 +1,58 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "dev",
+			"problemMatcher": [],
+			"label": "npm: dev",
+			"detail": "vite",
+		},
+		{
+			"type": "npm",
+			"script": "emulators",
+			"problemMatcher": [],
+			"label": "npm: emulators",
+			"detail": "firebase emulators:start"
+		},
+		{
+			"type": "npm",
+			"script": "build",
+			"path": "functions",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: build - functions",
+			"detail": "tsc"
+		},
+		{
+			"type": "npm",
+			"script": "serve",
+			"path": "functions",
+			"problemMatcher": [],
+			"label": "npm: serve - functions",
+			"detail": "npm run build && firebase emulators:start --only functions"
+		},
+		{
+			"type": "npm",
+			"script": "deploy",
+			"path": "functions",
+			"problemMatcher": [],
+			"label": "npm: deploy - functions",
+			"detail": "firebase deploy --only functions"
+		},
+		{
+			"type": "npm",
+			"script": "serve",
+			"problemMatcher": [],
+			"label": "npm: serve",
+			"detail": "vite preview"
+		},
+		{
+			"type": "npm",
+			"script": "rules",
+			"problemMatcher": [],
+			"label": "npm: rules",
+			"detail": "firebase deploy --only firestore:rules"
+		},
+	]
+}
