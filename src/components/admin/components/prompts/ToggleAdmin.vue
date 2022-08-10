@@ -2,8 +2,8 @@
   <v-dialog
     v-model="dialog"
     fullscreen
-    max-width="500px"
-    max-height="340px"
+    :max-width="user.roles.admin ? '350px' : '500px'"
+    :max-height="user.roles.admin ? '120px' : '340px'"
     :overlay="true"
     persistent
     transition="dialog-transition"
@@ -26,7 +26,11 @@
     </template>
     <v-card :loading="loading.dialog">
       <v-card-title>Are you sure?</v-card-title>
-      <v-card-text>
+      <v-card-subtitle>
+        This will {{ user.roles.admin ? "remove" : "add" }} the user as an
+        administrator.
+      </v-card-subtitle>
+      <v-card-text v-if="!user.roles.admin">
         When a user is an administrator they can:
         <v-list>
           <v-list-item v-for="(item, index) in list" :key="item">
@@ -35,7 +39,6 @@
         </v-list>
       </v-card-text>
       <v-card-actions>
-        <v-btn color="red" text @click="cancel()"> Cancel </v-btn>
         <v-btn
           color="primary"
           text
@@ -44,6 +47,7 @@
         >
           OK
         </v-btn>
+        <v-btn color="red" text @click="cancel()"> Cancel </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

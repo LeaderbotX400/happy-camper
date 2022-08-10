@@ -218,7 +218,7 @@ export default defineComponent({
       }
 
       try {
-        const callable = httpsCallable(functions, "submitOrder");
+        const callable = httpsCallable(functions, "orders-submit");
         await callable({
           items: items,
           total: this.total,

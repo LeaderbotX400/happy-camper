@@ -70,13 +70,10 @@
             </v-row>
             <v-row v-if="!order.completed">
               <v-col>
-                <v-btn
-                  color="success"
-                  size="small"
-                  @click="completeOrder(index)"
-                >
-                  Complete
-                </v-btn>
+                <CompleteOrder
+                  :index="(index as any)"
+                  @complete="completeOrder"
+                />
               </v-col>
             </v-row>
             <v-row>
@@ -100,9 +97,13 @@
 import { defineComponent } from "vue";
 import { auth, db } from "@/firebase";
 import { doc, onSnapshot, collection, updateDoc } from "@firebase/firestore";
+import CompleteOrder from "@/components/admin/components/prompts/CompleteOrder.vue";
 
 export default defineComponent({
   name: "Home",
+  components: {
+    CompleteOrder,
+  },
   data() {
     return {
       orders: <any>{},
