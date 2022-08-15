@@ -22,6 +22,7 @@
     "firebase": "^9.9.2",
     "firebaseui": "^6.0.1",
     "roboto-fontface": "*",
+    "rollup": "^2.78.0",
     "rollup-plugin-terser": "^7.0.2",
     "vue": "^3.2.37",
     "vue-router": "^4.1.3",
