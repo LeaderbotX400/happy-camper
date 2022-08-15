@@ -1,12 +1,12 @@
 <template>
-  <v-container class="text-center">
+  <v-container>
     <v-btn color="primary">
       New Pre-Order
       <v-dialog :fullscreen="mobile" v-model="dialog" activator="parent">
         <v-card :disabled="loading" :loading="loading">
           <v-alert v-if="error.status">
             <v-alert-title color="error">
-              <v-icon color="yellow">mdi-warning</v-icon>
+              <v-icon color="red">mdi-alert</v-icon>
               {{ error.message }}
             </v-alert-title>
           </v-alert>
@@ -38,10 +38,10 @@
             </div>
             <v-form>
               <v-card-text>
-                <v-container v-for="(item, index) in selection" :key="index">
+                <v-container v-for="(item, index) in items" :key="index">
                   <v-row>
                     <v-checkbox
-                      v-model="selection[item.name].selected"
+                      v-model="items[item.name].selected"
                       :disabled="!item.available"
                     >
                       <template v-slot:label>
@@ -55,8 +55,8 @@
                   </v-row>
                   <v-row>
                     <v-text-field
-                      v-if="selection[item.name].selected"
-                      v-model="selection[item.name].quantity"
+                      v-if="items[item.name].selected"
+                      v-model="items[item.name].quantity"
                       validation-value="4"
                       :rules="rules.quantity"
                       :label="`Quantity (max: ${item.stock})`"
@@ -69,14 +69,16 @@
                       min="1"
                       max="100"
                       density="comfortable"
-                      variant="outlined"
+                      variant="underlined"
                     />
                   </v-row>
                 </v-container>
               </v-card-text>
             </v-form>
             <v-row>
-              <v-card-title>total: ${{ total }} </v-card-title>
+              <v-col cols="6">
+                <v-card-title>total: ${{ total }} </v-card-title>
+              </v-col>
             </v-row>
           </v-container>
           <v-card-actions>
@@ -93,7 +95,7 @@
           <v-expand-transition>
             <v-code class="ma-2" v-if="rawData">
               <h3>Raw data:</h3>
-              <pre>Items: {{ selection }}</pre>
+              <pre>Items: {{ items }}</pre>
               <pre>Stock check: {{ checkStock }}</pre>
             </v-code>
           </v-expand-transition>
@@ -128,11 +130,17 @@ interface Selection {
   };
 }
 
+interface Item {
+  name: string;
+  price: number;
+  stock: number;
+  available: boolean;
+}
+
 export default defineComponent({
-  name: "Home",
+  name: "Pre-Order",
   setup() {
     const { mobile } = useDisplay();
-
     return { mobile };
   },
   props: {
@@ -143,9 +151,13 @@ export default defineComponent({
   },
   data() {
     return {
-      loading: false as boolean,
-      dialog: false as boolean,
-      selection: <Selection>{},
+      dialog: false,
+      loading: false,
+      error: {
+        status: false,
+        message: "",
+      },
+      items: {} as Selection,
       rules: {
         required: [(v: any) => !!v || "This field is required"],
         quantity: [
@@ -153,38 +165,31 @@ export default defineComponent({
           (v: any) => v > 0 || "Quantity must be greater than 0",
         ],
       },
-      error: {
-        status: false,
-        message: "",
-      },
-      rawData: false as boolean,
+      rawData: false,
     };
   },
   computed: {
     total() {
       let total = 0;
-      for (const item in this.selection) {
-        if (
-          this.selection[item].selected &&
-          this.selection[item].quantity > 0
-        ) {
-          let price = this.selection[item].price;
+      for (const item in this.items) {
+        if (this.items[item].selected && this.items[item].quantity > 0) {
+          let price = this.items[item].price;
           if (price) {
-            total += price * this.selection[item].quantity;
+            total += price * this.items[item].quantity;
           }
         }
       }
       return total;
     },
     checkStock() {
-      for (const item in this.selection) {
+      for (const item in this.items) {
         if (
-          this.selection[item].selected &&
-          this.selection[item].quantity > this.selection[item].stock
+          this.items[item].selected &&
+          this.items[item].quantity > this.items[item].stock
         ) {
           return {
             error: true,
-            errorMsg: `Not enough ${this.selection[item].name} to fulfill order: only ${this.selection[item].stock} units in stock`,
+            errorMsg: `Not enough ${this.items[item].name} to fulfill order: only ${this.items[item].stock} units in stock`,
           };
         } else {
           return {
@@ -199,43 +204,40 @@ export default defineComponent({
     async submit() {
       this.loading = true;
       let items = [];
-      for (const item in this.selection) {
+      for (const item in this.items) {
         if (this.total == 0) {
           this.cancel();
           return;
         }
         if (
-          this.total > 0 && // if total is 0, don't submit
-          this.selection[item].selected && // if item is selected
-          this.selection[item].quantity > 0 && // quantity must be greater than 0
-          this.selection[item].available // check if item is available
+          this.items[item].selected &&
+          this.items[item].quantity > 0 &&
+          this.items[item].available
         ) {
           items.push({
-            name: item,
-            quantity: this.selection[item].quantity,
+            name: this.items[item].name,
+            quantity: this.items[item].quantity,
           });
         }
       }
 
       try {
-        const callable = httpsCallable(functions, "orders-submit");
-        await callable({
-          items: items,
+        const submitOrder = httpsCallable(functions, "orders-submit");
+        await submitOrder({
+          items,
           total: this.total,
         });
         this.cancel();
       } catch (error) {
-        this.error = {
-          status: true,
-          message: error as string,
-        };
+        this.error.status = true as boolean;
+        this.error.message = error as string;
       }
       this.loading = false;
     },
     cancel() {
-      for (const item in this.selection) {
-        this.selection[item].selected = false;
-        this.selection[item].quantity = 0;
+      for (const item in this.items) {
+        this.items[item].selected = false;
+        this.items[item].quantity = 0;
       }
       this.loading = false;
       this.dialog = false;
@@ -246,22 +248,20 @@ export default defineComponent({
     },
   },
   mounted() {
-    onSnapshot(doc(db, "data/items"), (snapshot: any) => {
-      if (snapshot.data().items.length > 0) {
-        this.selection = {};
-        snapshot.data().items.forEach((item: any) => {
-          if (!this.selection[item.name]) {
-            this.selection[item.name] = {
-              name: item.name,
-              selected: false as boolean,
-              quantity: null as number | null,
-              price: Number(item.price) as number,
-              stock: Number(item.stock) as number,
-              available: item.available as boolean,
-            };
-          }
-        });
-      }
+    onSnapshot(doc(db, "data/items"), (snapshot) => {
+      this.items = {};
+      snapshot.data()?.items.forEach((item: Item) => {
+        if (!this.items[item.name]) {
+          this.items[item.name] = {
+            name: item.name,
+            selected: false as boolean,
+            quantity: null as number | null,
+            price: Number(item.price) as number,
+            stock: Number(item.stock) as number,
+            available: item.available as boolean,
+          };
+        }
+      });
     });
   },
 });

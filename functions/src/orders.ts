@@ -16,6 +16,7 @@ export const submit = functions.https.onCall(async (data, context) => {
   if (context.app == undefined) {
     throw new functions.https.HttpsError("permission-denied", "Unknown origin");
   }
+
   // only allow logged in users to submit orders
   if (context.auth == undefined) {
     throw new functions.https.HttpsError(
@@ -32,6 +33,7 @@ export const submit = functions.https.onCall(async (data, context) => {
     created: admin.firestore.FieldValue.serverTimestamp(),
     email: context.auth?.token.email as string,
   });
+
   // update item stats
   await admin.firestore().runTransaction(async (t) => {
     const doc = await t.get(admin.firestore().doc("data/items"));
@@ -52,6 +54,7 @@ export const submit = functions.https.onCall(async (data, context) => {
       items: newItems,
     });
   });
+
   // update user stats
   await admin.firestore().runTransaction(async (t) => {
     const doc = await t.get(
@@ -68,6 +71,7 @@ export const submit = functions.https.onCall(async (data, context) => {
       },
     });
   });
+
   return batch.commit().catch((err) => {
     throw new functions.https.HttpsError("internal", err);
   });
@@ -98,7 +102,7 @@ export const complete = functions.https.onCall(async (data, context) => {
   const batch = admin.firestore().batch();
   batch.update(admin.firestore().doc(`orders/${data.id}`), {
     completed: true,
-    completedDate: admin.firestore.FieldValue.serverTimestamp(),
+    completionDate: admin.firestore.FieldValue.serverTimestamp(),
   });
   return batch.commit().catch((err) => {
     return err;

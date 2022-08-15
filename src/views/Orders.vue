@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container align="center">
     <PreOrder :dev="dev" />
     <v-container>
       <v-row>
@@ -26,9 +26,9 @@ export default defineComponent({
   },
   data() {
     return {
-      orders: <any>{},
+      orders: [],
       loggedIn: false,
-      dev: false as any,
+      dev: false as unknown,
     };
   },
   mounted() {

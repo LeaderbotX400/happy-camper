@@ -54,23 +54,23 @@
               density="comfortable"
             />
           </v-col>
-          <v-row>
-            <v-col>
-              <v-switch
-                :color="item.available ? 'green' : 'red'"
-                :label="
-                  item.stock == 0
-                    ? 'Out Of Stock'
-                    : item.available
-                    ? 'Available'
-                    : 'Unavailable'
-                "
-                :disabled="item.stock <= 0"
-                message="Change availability"
-                v-model="item.available"
-              />
-            </v-col>
-          </v-row>
+        </v-row>
+        <v-row>
+          <v-col>
+            <v-switch
+              :color="item.available ? 'green' : 'red'"
+              :label="
+                item.stock == 0
+                  ? 'Out Of Stock'
+                  : item.available
+                  ? 'Available'
+                  : 'Unavailable'
+              "
+              :disabled="item.stock <= 0"
+              message="Change availability"
+              v-model="item.available"
+            />
+          </v-col>
         </v-row>
       </v-card-text>
       <v-card-actions>

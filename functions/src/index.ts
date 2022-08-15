@@ -4,15 +4,8 @@ admin.initializeApp();
 
 import * as orders from "./orders";
 import * as items from "./items";
-import BillingLimiter from "./billing";
 
 export { orders, items };
-
-// eslint-disable-next-line new-cap
-export const billingLimit = BillingLimiter({
-  disableProjectAmount: 0.01,
-  topicId: "billing",
-});
 
 export const newUser = functions.auth.user().onCreate(async (user) => {
   const batch = admin.firestore().batch();
