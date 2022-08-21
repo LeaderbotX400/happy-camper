@@ -2,7 +2,7 @@
   <v-app>
     <v-app-bar color="secondary">
       <v-toolbar-title> Happy Camper freeze dried snacks </v-toolbar-title>
-      <v-spacer></v-spacer>
+      <v-spacer />
       <UserMenu />
     </v-app-bar>
     <v-main>
@@ -21,8 +21,14 @@ export default defineComponent({
   },
   data() {
     return {
-      user: <any>{},
+      user: {},
     };
   },
 });
 </script>
+
+<style>
+* {
+  text-decoration: none;
+}
+</style>
