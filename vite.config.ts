@@ -13,6 +13,9 @@ import { terser } from "rollup-plugin-terser";
 export default defineConfig({
   server: {
     https: true,
+    headers: {
+      "Referrer-Policy": "no-referrer",
+    },
   },
   plugins: [
     vue(),
