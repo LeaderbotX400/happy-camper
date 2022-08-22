@@ -112,6 +112,8 @@ import { httpsCallable } from "@firebase/functions";
 import { doc, onSnapshot } from "@firebase/firestore";
 import { useDisplay } from "vuetify";
 
+let unsubscribe: () => void;
+
 interface Item {
   name: string;
   price: number;
@@ -247,8 +249,11 @@ export default defineComponent({
       };
     },
   },
+  beforeDestroy() {
+    unsubscribe();
+  },
   mounted() {
-    onSnapshot(doc(db, "data/items"), (snapshot) => {
+    unsubscribe = onSnapshot(doc(db, "data/items"), (snapshot) => {
       this.items = {};
       snapshot.data()?.items.forEach((item: Item) => {
         if (!this.items[item.name]) {

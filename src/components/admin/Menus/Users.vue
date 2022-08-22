@@ -13,6 +13,8 @@ import { defineComponent, defineAsyncComponent } from "vue";
 import { auth, db } from "@/firebase";
 import { onSnapshot, collection } from "@firebase/firestore";
 
+let unsubscribe: () => void;
+
 export default defineComponent({
   name: "Users",
   components: {
@@ -26,16 +28,18 @@ export default defineComponent({
       dev: false as boolean,
     };
   },
+  beforeDestroy() {
+    unsubscribe();
+  },
   mounted() {
     auth.currentUser?.getIdTokenResult().then((idTokenResult) => {
       if (idTokenResult.claims.dev) {
         this.dev = true;
       }
     });
-    onSnapshot(collection(db, "users"), (querySnapshot) => {
-      this.users = [];
-      querySnapshot.forEach((doc) => {
-        this.users.push(doc.data());
+    unsubscribe = onSnapshot(collection(db, "users"), (querySnapshot) => {
+      this.users = querySnapshot.docs.map((doc) => {
+        return doc.data();
       });
     });
   },

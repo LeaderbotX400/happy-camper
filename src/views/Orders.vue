@@ -12,24 +12,27 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, defineAsyncComponent } from "vue";
 import { auth, db } from "@/firebase";
-import PreOrder from "@/components/PreOrder.vue";
 import { onSnapshot, where, collection, query } from "@firebase/firestore";
-import Order from "@/components/Order.vue";
+
+let unsubscribe: () => void;
 
 export default defineComponent({
   name: "Home",
   components: {
-    PreOrder,
-    Order,
+    PreOrder: defineAsyncComponent(() => import("@/components/PreOrder.vue")),
+    Order: defineAsyncComponent(() => import("@/components/Order.vue")),
   },
   data() {
     return {
       orders: [],
       loggedIn: false,
-      dev: false as unknown,
+      dev: false as any,
     };
+  },
+  beforeDestroy() {
+    unsubscribe();
   },
   mounted() {
     auth.onAuthStateChanged((user) => {
@@ -42,14 +45,16 @@ export default defineComponent({
             collection(db, "orders"),
             where("email", "==", auth.currentUser?.email)
           );
-          onSnapshot(q, (querySnapshot) => {
+          unsubscribe = onSnapshot(q, (querySnapshot) => {
             this.orders = [];
             querySnapshot.forEach((doc) => {
+              // @ts-expect-error
               this.orders.push(doc.data());
             });
           });
         } catch (error) {}
       } else {
+        unsubscribe();
         this.$router.push("/login");
       }
     });

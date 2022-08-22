@@ -84,6 +84,8 @@ import { defineComponent, defineAsyncComponent } from "vue";
 import { auth, db } from "@/firebase";
 import { onSnapshot, collection, query, where } from "@firebase/firestore";
 
+let unsubscribe: () => void;
+
 interface Order {
   email: string;
   items: any[];
@@ -113,6 +115,9 @@ export default defineComponent({
       () => import("@/components/admin/components/prompts/CompleteOrder.vue")
     ),
   },
+  beforeDestroy() {
+    unsubscribe();
+  },
   mounted() {
     auth.onAuthStateChanged((user) => {
       if (user) {
@@ -126,7 +131,7 @@ export default defineComponent({
             collection(db, "orders"),
             where("completed", "==", false)
           );
-          onSnapshot(q, (snapshot) => {
+          unsubscribe = onSnapshot(q, (snapshot) => {
             this.orders = {};
             snapshot.forEach((doc) => {
               this.orders[doc.id] = doc.data() as Order;
@@ -136,6 +141,8 @@ export default defineComponent({
         } catch (err) {
           this.$emit("error", err);
         }
+      } else {
+        unsubscribe();
       }
     });
   },

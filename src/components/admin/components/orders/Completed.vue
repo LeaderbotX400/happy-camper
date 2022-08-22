@@ -93,6 +93,8 @@ import {
   Timestamp,
 } from "@firebase/firestore";
 
+let unsubscribe: () => void;
+
 interface Order {
   email: string;
   items: any[];
@@ -126,6 +128,9 @@ export default defineComponent({
       return "";
     },
   },
+  beforeDestroy() {
+    unsubscribe();
+  },
   mounted() {
     auth.onAuthStateChanged((user) => {
       if (user) {
@@ -139,7 +144,7 @@ export default defineComponent({
             collection(db, "orders"),
             where("completed", "==", true)
           );
-          onSnapshot(q, (snapshot) => {
+          unsubscribe = onSnapshot(q, (snapshot) => {
             this.orders = {};
             snapshot.forEach((doc) => {
               this.orders[doc.id] = doc.data() as Order;
@@ -149,6 +154,8 @@ export default defineComponent({
         } catch (error) {
           this.$emit("handles", error);
         }
+      } else {
+        unsubscribe();
       }
     });
   },

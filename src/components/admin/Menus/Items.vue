@@ -18,6 +18,8 @@ import { defineComponent, defineAsyncComponent } from "vue";
 import { db } from "@/firebase";
 import { doc, onSnapshot } from "@firebase/firestore";
 
+let unsubscribe: () => void;
+
 export default defineComponent({
   name: "Item Menu",
   components: {
@@ -33,8 +35,11 @@ export default defineComponent({
       items: [] as any,
     };
   },
+  beforeDestroy() {
+    unsubscribe();
+  },
   mounted() {
-    onSnapshot(doc(db, "data/items"), (doc) => {
+    unsubscribe = onSnapshot(doc(db, "data/items"), (doc) => {
       this.items = doc.data()?.items;
     });
   },
