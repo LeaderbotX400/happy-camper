@@ -92,17 +92,20 @@ interface Input {
   available: boolean;
 }
 
+interface Error {
+  message: string;
+  dialog: boolean;
+}
 export default defineComponent({
   data() {
     return {
-      input: <Input>{
-        name: "" as string,
-        price: 0 as number,
-        stock: 0 as number,
-        available: false as boolean,
-      },
+      input: {
+        name: "",
+        price: 0,
+        stock: 0,
+        available: true,
+      } as Input,
       loading: false,
-      props: false,
       rules: {
         name: [(v: any) => !!v || "Name is required"],
         price: [(v: any) => !!v || "Price is required"],
@@ -110,20 +113,24 @@ export default defineComponent({
       },
       inputMenu: false,
       error: {
-        dialog: false as boolean,
-        message: "" as string,
-      },
+        dialog: false,
+        message: "",
+      } as Error,
     };
   },
   methods: {
     cancel() {
-      this.inputMenu = false;
       this.input = {
-        name: "" as string,
-        price: 0 as number,
-        stock: 0 as number,
-        available: false as boolean,
-      };
+        name: "",
+        price: 0,
+        stock: 0,
+        available: true,
+      } as Input;
+      this.error = {
+        dialog: false,
+        message: "",
+      } as Error;
+      this.inputMenu = false;
     },
     async addItem(input: Input) {
       // @ts-ignore
