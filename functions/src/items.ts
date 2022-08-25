@@ -15,13 +15,14 @@ export const addItem = functions.https.onCall(async (data, context) => {
   console.log(data);
   const item = {
     name: data.name as string,
-    price: Number(data.price),
-    stock: Number(data.stock),
+    price: Number(data.price) as number,
+    stock: Number(data.stock) as number,
     stats: {
       totalSold: 0 as number,
     },
     available: data.available as boolean,
   };
+
   const batch = admin.firestore().batch();
   batch.update(admin.firestore().doc("data/items"), {
     items: admin.firestore.FieldValue.arrayUnion(item),
