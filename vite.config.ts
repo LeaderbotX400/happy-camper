@@ -21,6 +21,7 @@ export default defineConfig({
     vue(),
     vuetify({ autoImport: true }),
     mkcert(),
+    // @ts-expect-error
     terser({
       compress: {
         drop_console: true,
