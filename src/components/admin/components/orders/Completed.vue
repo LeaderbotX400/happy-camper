@@ -92,24 +92,9 @@ import {
   where,
   Timestamp,
 } from "@firebase/firestore";
+import type { Order, Orders, RawData } from "@/types/orders";
 
 let unsubscribe: () => void;
-
-interface Order {
-  email: string;
-  items: any[];
-  total: number;
-  completed: boolean;
-  completionDate: Timestamp | null | undefined;
-}
-
-interface Orders {
-  [key: string]: Order;
-}
-
-interface RawData {
-  [key: string]: boolean;
-}
 
 export default defineComponent({
   name: "PendingOrders",
@@ -128,7 +113,7 @@ export default defineComponent({
       return "";
     },
   },
-  beforeDestroy() {
+  beforeUnmount() {
     unsubscribe();
   },
   mounted() {

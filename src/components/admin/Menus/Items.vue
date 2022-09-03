@@ -17,11 +17,12 @@
 import { defineComponent, defineAsyncComponent } from "vue";
 import { db } from "@/firebase";
 import { doc, onSnapshot } from "@firebase/firestore";
+import type { Item } from "@/types";
 
 let unsubscribe: () => void;
 
 export default defineComponent({
-  name: "Item Menu",
+  name: "ItemMenu",
   components: {
     AddItem: defineAsyncComponent(
       () => import("@/components/admin/components/prompts/AddItem.vue")
@@ -32,10 +33,10 @@ export default defineComponent({
   },
   data() {
     return {
-      items: [] as any,
+      items: [] as Item[],
     };
   },
-  beforeDestroy() {
+  beforeUnmount() {
     unsubscribe();
   },
   mounted() {

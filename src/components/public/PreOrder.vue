@@ -125,18 +125,11 @@ interface Selection {
   [key: string]: {
     name: string;
     selected: boolean;
-    quantity: any;
+    quantity: number;
     price: number;
     stock: number;
     available: boolean;
   };
-}
-
-interface Item {
-  name: string;
-  price: number;
-  stock: number;
-  available: boolean;
 }
 
 export default defineComponent({
@@ -161,10 +154,10 @@ export default defineComponent({
       },
       items: {} as Selection,
       rules: {
-        required: [(v: any) => !!v || "This field is required"],
+        required: [(v: string) => !!v || "This field is required"],
         quantity: [
-          (v: any) => !!v || "This field is required",
-          (v: any) => v > 0 || "Quantity must be greater than 0",
+          (v: string) => !!v || "This field is required",
+          (v: number) => v > 0 || "Quantity must be greater than 0",
         ],
       },
       rawData: false,
@@ -175,7 +168,7 @@ export default defineComponent({
       let total = 0;
       for (const item in this.items) {
         if (this.items[item].selected && this.items[item].quantity > 0) {
-          let price = this.items[item].price;
+          const price = this.items[item].price;
           if (price) {
             total += price * this.items[item].quantity;
           }
@@ -183,21 +176,16 @@ export default defineComponent({
       }
       return total;
     },
+    // eslint-disable-next-line vue/return-in-computed-property
     checkStock() {
       for (const item in this.items) {
-        if (
-          this.items[item].selected &&
-          this.items[item].quantity > this.items[item].stock
-        ) {
-          return {
-            error: true,
-            errorMsg: `Not enough ${this.items[item].name} to fulfill order: only ${this.items[item].stock} units in stock`,
-          };
-        } else {
-          return {
-            error: false,
-            errorMsg: "",
-          };
+        if (this.items[item].selected) {
+          if (this.items[item].quantity > this.items[item].stock) {
+            return {
+              error: true,
+              errorMsg: `Not enough ${this.items[item].name} to fulfill order: only ${this.items[item].stock} units in stock`,
+            };
+          }
         }
       }
     },
@@ -205,7 +193,7 @@ export default defineComponent({
   methods: {
     async submit() {
       this.loading = true;
-      let items = [];
+      const items = [];
       for (const item in this.items) {
         if (this.total == 0) {
           this.cancel();
@@ -249,7 +237,7 @@ export default defineComponent({
       };
     },
   },
-  beforeDestroy() {
+  beforeUnmount() {
     unsubscribe();
   },
   mounted() {
@@ -260,7 +248,7 @@ export default defineComponent({
           this.items[item.name] = {
             name: item.name,
             selected: false as boolean,
-            quantity: null as number | null,
+            quantity: 0 as number,
             price: Number(item.price) as number,
             stock: Number(item.stock) as number,
             available: item.available as boolean,

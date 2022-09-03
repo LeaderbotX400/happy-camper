@@ -69,27 +69,13 @@
 import { defineComponent } from "vue";
 import ToggleAdmin from "@/components/admin/components/prompts/ToggleAdmin.vue";
 import DeleteUser from "./prompts/DeleteUser.vue";
-
-interface User {
-  data: {
-    email: string;
-    photoURL: string;
-  };
-  stats: {
-    totalOrders: number;
-    totalSpent: number;
-  };
-  roles: {
-    admin: boolean;
-    dev: boolean;
-  };
-}
+import type { UserPlus } from "@/types";
 
 export default defineComponent({
-  name: "Users",
+  name: "UserAdminComponent",
   props: {
     user: {
-      type: Object as () => User,
+      type: Object as () => UserPlus,
       required: true,
     },
     dev: {
@@ -112,7 +98,7 @@ export default defineComponent({
     };
   },
   methods: {
-    errorHandler(err: any) {
+    errorHandler(err: string) {
       this.error.status = true;
       this.error.message = err;
     },

@@ -57,22 +57,13 @@
 import { defineComponent } from "vue";
 import { functions } from "@/firebase";
 import { httpsCallable } from "@firebase/functions";
-
-interface User {
-  roles: {
-    admin: boolean;
-    dev: boolean;
-  };
-  data: {
-    email: string;
-  };
-}
+import type { UserPlus } from "@/types";
 
 export default defineComponent({
   name: "TogglePerms",
   props: {
     user: {
-      type: Object as () => User,
+      type: Object as () => UserPlus,
       required: true,
     },
   },

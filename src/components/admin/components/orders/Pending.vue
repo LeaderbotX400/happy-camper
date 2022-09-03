@@ -29,9 +29,9 @@
                 Order:
                 <v-list-item v-for="(item, index) in order.items" :key="index">
                   <v-list-item-title>{{ item.name }}</v-list-item-title>
-                  <v-list-item-subtitle>{{
-                    item.quantity
-                  }}</v-list-item-subtitle>
+                  <v-list-item-subtitle>
+                    {{ item.quantity }}
+                  </v-list-item-subtitle>
                 </v-list-item>
               </v-list>
             </v-col>
@@ -83,23 +83,9 @@
 import { defineComponent, defineAsyncComponent } from "vue";
 import { auth, db } from "@/firebase";
 import { onSnapshot, collection, query, where } from "@firebase/firestore";
+import type { Order, Orders, RawData } from "@/types/orders";
 
 let unsubscribe: () => void;
-
-interface Order {
-  email: string;
-  items: any[];
-  total: number;
-  completed: boolean;
-}
-
-interface Orders {
-  [key: string]: Order;
-}
-
-interface RawData {
-  [key: string]: boolean;
-}
 
 export default defineComponent({
   name: "PendingOrders",
@@ -115,7 +101,7 @@ export default defineComponent({
       () => import("@/components/admin/components/prompts/CompleteOrder.vue")
     ),
   },
-  beforeDestroy() {
+  beforeUnmount() {
     unsubscribe();
   },
   mounted() {

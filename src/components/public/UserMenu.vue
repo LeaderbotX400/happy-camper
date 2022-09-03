@@ -3,7 +3,7 @@
     <template v-slot:activator="{ props }">
       <v-btn icon v-bind="props">
         <v-avatar>
-          <v-img :src="user.photoURL" alt="Avatar" />
+          <v-img :src="(user?.photoURL as string)" alt="Avatar" />
         </v-avatar>
       </v-btn>
     </template>
@@ -11,18 +11,15 @@
       <v-card-text>
         <div class="mx-auto text-center">
           <v-avatar size="large">
-            <v-img :src="user.photoURL" alt="Avatar" />
+            <v-img :src="(user?.photoURL as string)" alt="Avatar" />
           </v-avatar>
           <h3>{{ user.displayName }}</h3>
           <p class="text-caption mt-1">{{ user.email }}</p>
           <div v-if="admin">
             <v-divider class="my-3" />
-            <router-link
-              to="/admin"
-              style="text-decoration: none; color: inherit"
-            >
-              <v-btn rounded variant="text">admin menu</v-btn>
-            </router-link>
+            <v-btn rounded variant="text" @click="$router.push('/admin')">
+              admin menu
+            </v-btn>
           </div>
           <v-divider class="my-3" />
           <v-btn rounded variant="text" @click="logout()"> logout </v-btn>
@@ -34,13 +31,14 @@
 
 <script lang="ts">
 import { auth } from "@/firebase";
+import type { User } from "@firebase/auth";
 import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "UserMenu",
   data() {
     return {
-      user: <any>{},
+      user: {} as User,
       loggedIn: false,
       admin: false,
     };
@@ -61,7 +59,7 @@ export default defineComponent({
         this.user = user;
         this.loggedIn = true;
       } else {
-        this.user = {};
+        this.user = {} as User;
         this.loggedIn = false;
       }
     });

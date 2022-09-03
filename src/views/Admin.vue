@@ -56,7 +56,7 @@
 import { defineComponent, defineAsyncComponent } from "vue";
 
 export default defineComponent({
-  name: "Admin",
+  name: "AdminView",
   data() {
     return {
       items: [],

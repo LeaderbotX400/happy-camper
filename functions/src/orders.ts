@@ -1,15 +1,7 @@
+/* eslint-disable indent */
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-
-interface Item {
-  name: string;
-  price: number;
-  stock: number;
-  available: boolean;
-  stats: {
-    totalSold: number;
-  };
-}
+import { Item } from "./types";
 
 export const submit = functions.https.onCall(async (data, context) => {
   console.log(context.auth);
@@ -103,6 +95,37 @@ export const complete = functions.https.onCall(async (data, context) => {
   batch.update(admin.firestore().doc(`orders/${data.id}`), {
     completed: true,
     completionDate: admin.firestore.FieldValue.serverTimestamp(),
+  });
+  return batch.commit().catch((err) => {
+    return err;
+  });
+});
+
+export const changeStatus = functions.https.onCall(async (data, context) => {
+  if (context.app == undefined) {
+    throw new functions.https.HttpsError("permission-denied", "Unknown origin");
+  }
+  if (context.auth == undefined) {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "You must be logged in to do this"
+    );
+  }
+  if (context.auth?.token.admin !== true) {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "You must be an administrator to do this"
+    );
+  }
+  if (data.id == undefined || data.id == "") {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "You must provide an order id"
+    );
+  }
+  const batch = admin.firestore().batch();
+  batch.update(admin.firestore().doc(`orders/${data.id}`), {
+    status: data.status,
   });
   return batch.commit().catch((err) => {
     return err;

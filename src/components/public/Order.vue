@@ -78,10 +78,11 @@
 </template>
 
 <script lang="ts">
+import type { Timestamp } from "@firebase/firestore";
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: "Order",
+  name: "OrderComponent",
   props: {
     order: {
       type: Object,
@@ -102,7 +103,7 @@ export default defineComponent({
     };
   },
   methods: {
-    date(date: any) {
+    date(date: Timestamp) {
       return date.toDate().toLocaleString();
     },
   },

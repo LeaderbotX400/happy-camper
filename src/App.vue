@@ -16,7 +16,9 @@ import { defineComponent, defineAsyncComponent } from "vue";
 export default defineComponent({
   name: "App",
   components: {
-    UserMenu: defineAsyncComponent(() => import("@/components/UserMenu.vue")),
+    UserMenu: defineAsyncComponent(
+      () => import("@/components/public/UserMenu.vue")
+    ),
   },
 });
 </script>

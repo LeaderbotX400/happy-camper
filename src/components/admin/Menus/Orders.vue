@@ -49,7 +49,7 @@ import { defineComponent, defineAsyncComponent } from "vue";
 import { auth } from "@/firebase";
 
 export default defineComponent({
-  name: "Home",
+  name: "OrdersAdmin",
   components: {
     Pending: defineAsyncComponent(
       () => import("@/components/admin/components/orders/Pending.vue")

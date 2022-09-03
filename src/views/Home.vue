@@ -12,7 +12,7 @@ import { defineComponent } from "vue";
 import { auth } from "@/firebase";
 
 export default defineComponent({
-  name: "Loading",
+  name: "HomeView",
   mounted() {
     auth.onAuthStateChanged((user) => {
       if (user) {

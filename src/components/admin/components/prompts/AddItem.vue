@@ -107,9 +107,9 @@ export default defineComponent({
       } as Input,
       loading: false,
       rules: {
-        name: [(v: any) => !!v || "Name is required"],
-        price: [(v: any) => !!v || "Price is required"],
-        stock: [(v: any) => !!v || "Stock amount is required"],
+        name: [(v: string) => !!v || "Name is required"],
+        price: [(v: number) => !!v || "Price is required"],
+        stock: [(v: number) => !!v || "Stock amount is required"],
       },
       inputMenu: false,
       error: {
@@ -133,8 +133,9 @@ export default defineComponent({
       this.inputMenu = false;
     },
     async addItem(input: Input) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      let checkValid = await this.$refs.newItem.validate();
+      const checkValid = await this.$refs.newItem.validate();
       if (checkValid.valid) {
         this.loading = true as boolean;
         try {

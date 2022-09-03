@@ -19,26 +19,28 @@ import { onSnapshot, where, collection, query } from "@firebase/firestore";
 let unsubscribe: () => void;
 
 export default defineComponent({
-  name: "Home",
+  name: "OrdersView",
   components: {
-    PreOrder: defineAsyncComponent(() => import("@/components/PreOrder.vue")),
-    Order: defineAsyncComponent(() => import("@/components/Order.vue")),
+    PreOrder: defineAsyncComponent(
+      () => import("@/components/public/PreOrder.vue")
+    ),
+    Order: defineAsyncComponent(() => import("@/components/public/Order.vue")),
   },
   data() {
     return {
       orders: [],
       loggedIn: false,
-      dev: false as any,
+      dev: false,
     };
   },
-  beforeDestroy() {
+  beforeUnmount() {
     unsubscribe();
   },
   mounted() {
     auth.onAuthStateChanged((user) => {
       if (user) {
         user?.getIdTokenResult().then((idTokenResult) => {
-          this.dev = idTokenResult.claims.dev;
+          this.dev = idTokenResult.claims.dev ? true : false;
         });
         try {
           const q = query(
@@ -48,11 +50,14 @@ export default defineComponent({
           unsubscribe = onSnapshot(q, (querySnapshot) => {
             this.orders = [];
             querySnapshot.forEach((doc) => {
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-expect-error
               this.orders.push(doc.data());
             });
           });
-        } catch (error) {}
+        } catch (error) {
+          console.log(error);
+        }
       } else {
         unsubscribe();
         this.$router.push("/login");

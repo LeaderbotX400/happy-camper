@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-mutating-props -->
 <template>
   <v-card max-width="300" :disabled="loading" :loading="loading">
     <div class="text-center">
@@ -93,19 +94,10 @@
 import { defineComponent, defineAsyncComponent } from "vue";
 import { functions } from "@/firebase";
 import { httpsCallable } from "@firebase/functions";
-
-interface Item {
-  name: string;
-  price: number;
-  stock: number;
-  available: boolean;
-  stats: {
-    totalSold: number;
-  };
-}
+import type { Item } from "@/types";
 
 export default defineComponent({
-  name: "Item",
+  name: "ItemComponent",
   data() {
     return {
       rawData: false,
@@ -139,17 +131,17 @@ export default defineComponent({
     async updateItem() {
       this.loading = true;
       try {
-        let newItems: Object[] = [];
-        this.items.forEach((item: any) => {
-          newItems.push({
+        const newItems: Item[] = [];
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        this.items.forEach((item: Item) => {
+          const input = {
             name: item.name,
             price: Number(item.price),
             stock: Number(item.stock),
             available: item.available,
-            stats: {
-              totalSold: item.stats.totalSold,
-            },
-          });
+          } as Item;
+          newItems.push(input);
         });
         const updateItem = httpsCallable(functions, "updateItem");
         await updateItem({
